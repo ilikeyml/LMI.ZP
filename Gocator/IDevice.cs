@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace Gocator
 {
-    public class Class1
+    interface IDevice
     {
+        bool InitialAcq();
+        bool StartAcq();
+        bool StopAcq();
+        bool ReleaseAcq();
     }
 }

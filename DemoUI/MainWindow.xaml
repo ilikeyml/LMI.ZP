@@ -1,0 +1,85 @@
+﻿<Window x:Class="DemoUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DemoUI"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <Grid>
+        
+        <!--Row definition-->
+        <Grid.RowDefinitions>
+            <RowDefinition   Height="20"/>
+            <RowDefinition   Height="*"/>
+            <RowDefinition   Height="*"/>
+            <RowDefinition   Height="*"/>
+            <RowDefinition   Height="*"/>
+            <RowDefinition   Height="20"/>
+        </Grid.RowDefinitions>
+        
+        <!--Column Definition-->
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="1" 
+                Grid.Row="1"
+                Grid.ColumnSpan="4"
+                Grid.RowSpan="4" 
+                Background="DarkBlue"
+                BorderThickness="3"
+                BorderBrush="Black"
+                >
+            <Image >
+                
+            </Image>
+            
+        </Border>
+        <StackPanel 
+            Grid.Column="5" 
+            Grid.Row="1"
+            Grid.RowSpan="2"
+            >
+            <Button Height="30"
+                    Content="Connect"
+                    Background="White"
+                    Margin="3,0,0,5"
+                    >
+            </Button>
+            <Button Height="30"
+                    Content="Start"
+                    Background="White"
+                    Margin="3,0,0,5"
+                    >
+            </Button>
+            <Button Height="30"
+                    Content="Stop"
+                    Background="White"
+                    Margin="3,0,0,5"
+                    >
+            </Button>
+            <Button Height="30"
+                    Content="Disconnect"
+                    Background="White"
+                    Margin="3,0,0,5"
+                    >
+            </Button>
+        </StackPanel>
+        <TextBlock Grid.Row="3" 
+                   Grid.Column="5"
+                   Grid.RowSpan="2"
+                   Background="LightGoldenrodYellow"
+                   Margin="3,0,0,0"
+                   >
+            
+            
+        </TextBlock>
+    </Grid>
+</Window>
