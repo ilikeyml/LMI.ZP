@@ -5,7 +5,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Emgu.CV;
+using Emgu.CV.Structure;
 using Gocator;
+using VisionUtils;
 
 namespace DemoUI.ViewModels
 {
@@ -24,8 +27,15 @@ namespace DemoUI.ViewModels
 
         private void GocatorDevice_OnDataReceivedEvent(object sender, object e)
         {
-            
+            List<ushort[]> result = (List<ushort[]>)e;
+
+            for (int i = 0; i < result.Count; i++)
+            {
+                Image<Gray, ushort> image = DepthPng.ZValuesToDepthPng(result[i], gocatorDevice.mContext);
+                image.Save($@"C:\image{i}.png");
+            }
         }
+            
 
         private void GocatorDevice_DeviceStatusEvent(object sender, object e)
         {
@@ -42,7 +52,7 @@ namespace DemoUI.ViewModels
 
         private async void StartAction()
         {
-            await Task.Run(() => { gocatorDevice.StartAcq(); });      
+            await Task.Run(() => { gocatorDevice.StartAcq(); });
         }
 
     }

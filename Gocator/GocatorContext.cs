@@ -8,5 +8,7 @@
         public double XOffset { get; set; }
         public double YOffset { get; set; }
         public double ZOffset { get; set; }
+        public int Width { get; set; }
+        public int Height { get; set; }
     }
 }
