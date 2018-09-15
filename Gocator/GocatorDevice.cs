@@ -34,8 +34,6 @@ namespace Gocator
         #region ctor
         public GocatorDevice(string ipAddr, int bufferSize)
         {
-            KApiLib.Construct();
-            GoSdkLib.Construct();
             IPAddr = ipAddr;
             BufferSize = bufferSize;
             doDataWorker.DoWork += DoDataWorker_DoWork;
@@ -47,12 +45,14 @@ namespace Gocator
 
         private void DoDataWorker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            DeviceStatusEvent?.Invoke(this, $"Finished {e.ProgressPercentage} %");
+           
         }
 
         private void DoDataWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
             OnDataReceivedEvent?.Invoke(this, mResult);
+            mRawDataList.Clear();
+            mResult.Clear();
         }
 
         private void DoDataWorker_DoWork(object sender, DoWorkEventArgs e)
@@ -64,12 +64,14 @@ namespace Gocator
         #region Implement IDevice interface
         public bool InitialAcq()
         {
+            KApiLib.Construct();
+            GoSdkLib.Construct();
             mSystem = new GoSystem();
             mSensor = mSystem.FindSensorByIpAddress(KIpAddress.Parse(IPAddr));
             DeviceStatusEvent?.Invoke(this, $"Find device @ IP address {IPAddr}");
             mSensor.Connect();
-            mSystem.EnableData(true);
-            mSystem.SetDataHandler(OnData);
+            mSensor.EnableData(true);
+            mSensor.SetDataHandler(OnData);
             return true;
         }
 
@@ -86,8 +88,9 @@ namespace Gocator
         {
             Parallel.ForEach<KObject>(mRawDataList, (kData) => {
                 ResolveRawData(kData);
-                doDataWorker.ReportProgress((int)(mResult.Count / BufferSize * 1.0) * 100);
             });
+            StopAcq();
+            DeviceStatusEvent?.Invoke(this, $"Finished / Stop Acq/ Return Result");
             return mResult;        
         }
 
@@ -95,21 +98,32 @@ namespace Gocator
         {
             ushort[] data = new ushort[] { 1, 2, 3 };
             mResult.Add(data);
+            DeviceStatusEvent?.Invoke(this, $"Finished {100*mResult.Count/BufferSize*1.0} %");
         }
 
         public bool ReleaseAcq()
         {
-            throw new NotImplementedException();
+            this.DeviceStatusEvent = null;
+            this.OnDataReceivedEvent = null;
+            return true;
         }
 
         public bool StartAcq()
         {
+            if (mSensor.State != GoState.Ready)
+            {
+                mSensor.Stop();
+            }
+            mSensor.Start();
+            DeviceStatusEvent?.Invoke(this, $"Start Acq");
             return true;
         }
 
         public bool StopAcq()
         {
-            throw new NotImplementedException();
+            mSensor.Stop();
+            DeviceStatusEvent?.Invoke(this, $"Stop Acq");
+            return true;
         }
         #endregion
     }

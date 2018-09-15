@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:local="clr-namespace:DemoUI">
+    <FontFamily x:Key="RobotoBlack">pack://application;,,,/Fonts/#Roboto Black</FontFamily>
+    <FontFamily x:Key="RobotoItalic">pack://application;,,,/Fonts/#Roboto Italic</FontFamily>
+    <FontFamily x:Key="RobotoBold">pack://application;,,,/Fonts/#Roboto Bold</FontFamily>
+    <FontFamily x:Key="RobotoBoldItalic">pack://application;,,,/Fonts/#Roboto Bold Italic</FontFamily>
+    <FontFamily x:Key="RobotoLight">pack://application;,,,/Fonts/#Roboto Light</FontFamily>
+    <FontFamily x:Key="RobotoMedium">pack://application;,,,/Fonts/#Roboto Medium</FontFamily>
+    <FontFamily x:Key="RobotoRegular">pack://application;,,,/Fonts/#Roboto Regular</FontFamily>
+</ResourceDictionary>

@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DemoUI"
         mc:Ignorable="d"
+        FontFamily="{StaticResource  RobotoMedium}"
         Title="MainWindow" Height="450" Width="800">
     <Grid>
         
@@ -17,7 +18,6 @@
             <RowDefinition   Height="*"/>
             <RowDefinition   Height="20"/>
         </Grid.RowDefinitions>
-        
         <!--Column Definition-->
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="20"/>
@@ -29,6 +29,7 @@
             <ColumnDefinition Width="20"/>
 
         </Grid.ColumnDefinitions>
+        <!--Image area-->
         <Border Grid.Column="1" 
                 Grid.Row="1"
                 Grid.ColumnSpan="4"
@@ -42,44 +43,49 @@
             </Image>
             
         </Border>
+        <!--Button-->
         <StackPanel 
             Grid.Column="5" 
             Grid.Row="1"
             Grid.RowSpan="2"
             >
-            <Button Height="30"
-                    Content="Connect"
-                    Background="White"
-                    Margin="3,0,0,5"
-                    >
-            </Button>
+            <!--Start Acq-->
             <Button Height="30"
                     Content="Start"
                     Background="White"
                     Margin="3,0,0,5"
-                    >
-            </Button>
-            <Button Height="30"
-                    Content="Stop"
-                    Background="White"
-                    Margin="3,0,0,5"
-                    >
-            </Button>
-            <Button Height="30"
-                    Content="Disconnect"
-                    Background="White"
-                    Margin="3,0,0,5"
-                    >
-            </Button>
+                    Command="{Binding StartCommand}"
+                    />
+            <Grid Margin="3,0,0,3">
+                <Grid.RowDefinitions>
+                    <RowDefinition />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Label Grid.Column="0" Grid.Row="0" Content="IP Address"/>
+                <Label Grid.Column="0" Grid.Row="1" Content="BufferSize"/>
+                <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="0" Text="{Binding Path=IPAddress, Mode=OneWay}" />
+                <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="1"  Text="{Binding Path=BufferSize, Mode=OneWay}"/>
+
+            </Grid>
         </StackPanel>
-        <TextBlock Grid.Row="3" 
+        <!--Log -->
+        <ScrollViewer
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Auto"
+            Grid.Row="3" 
                    Grid.Column="5"
                    Grid.RowSpan="2"
+                               Margin="6,0,0,0">
+        <TextBlock 
                    Background="LightGoldenrodYellow"
-                   Margin="3,0,0,0"
+                   Text="{Binding Path=InfoMsg, Mode=OneWay}"
                    >
-            
-            
         </TextBlock>
+        </ScrollViewer>
     </Grid>
 </Window>
