@@ -21,7 +21,6 @@ namespace DemoUI.ViewModels
         GocatorDevice gocatorDevice;
         SynchronizationContext curContext;
         #endregion
-
         #region ctor
         public MainViewModel()
         {
@@ -33,14 +32,12 @@ namespace DemoUI.ViewModels
             gocatorDevice.InitialAcq();
         }
         #endregion
-
         #region device event
         private void GocatorDevice_OnDataReceivedEvent(object sender, object e)
         {
             List<ushort[]> result = (List<ushort[]>)e;
             for (int i = 0; i < result.Count; i++)
             {
-
                 Image<Gray, ushort> image = EmguToWpfImage.ZValuesToDepthPng(result[0], gocatorDevice.mContext);
                 curContext.Post(new SendOrPostCallback((o) =>
                 {
@@ -53,7 +50,6 @@ namespace DemoUI.ViewModels
             InfoMsg += $"{e.ToString()}  {Environment.NewLine}";
         }
         #endregion
-
         #region prop
         public string IPAddress { get; set; } = "127.0.0.1";
         public int BufferSize { get; set; } = 4;
@@ -61,7 +57,6 @@ namespace DemoUI.ViewModels
         public ImageSource DisplayImage { get; set; }
         public ICommand StartCommand { get; set; }
         #endregion
-
         #region Command methods
         private async void StartAction()
         {

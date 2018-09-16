@@ -6,12 +6,10 @@ using System;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media.Imaging;
-
 namespace VisionUtils
 {
     public class EmguToWpfImage
     {
-
         /// <summary>
         /// Trans zvalues to PNG 16bit
         /// </summary>
@@ -29,8 +27,6 @@ namespace VisionUtils
                 return depthPng.ToImage<Gray, ushort>();
             }
         }
-
-
         /// <summary>
         /// Trans zvalues to colormap
         /// </summary>
@@ -39,7 +35,6 @@ namespace VisionUtils
         {
             return null;
         }
-
         /// <summary>
         /// Delete a GDI object
         /// </summary>
@@ -47,7 +42,6 @@ namespace VisionUtils
         /// <returns></returns>
         [DllImport("gdi32")]
         private static extern int DeleteObject(IntPtr o);
-
         /// <summary>
         /// Convert an IImage to a WPF BitmapSource. The result can be used in the Set Property of Image.Source
         /// </summary>
@@ -58,7 +52,6 @@ namespace VisionUtils
             using (System.Drawing.Bitmap source = image.Bitmap)
             {
                 IntPtr ptr = source.GetHbitmap(); //obtain the Hbitmap
-
                 BitmapSource bs = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
                     ptr,
                     IntPtr.Zero,
@@ -68,7 +61,5 @@ namespace VisionUtils
                 return bs;
             }
         }
-
-
     }
 }
