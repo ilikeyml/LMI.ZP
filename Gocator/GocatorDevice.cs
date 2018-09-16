@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
-
 namespace Gocator
 {
     public class GocatorDevice : IDevice
@@ -17,24 +16,19 @@ namespace Gocator
         GoSensor mSensor;
         List<KObject> mRawDataList = new List<KObject>();
         List<ushort[]> mResult = new List<ushort[]>();
-
         #endregion
-
         #region prop
         public string IPAddr { get; set; }
         public int BufferSize { get; set; }
-        public GocatorContext mContext { get; set; }
+        public GocatorContext mContext { get; private set; }
         #endregion
-
         #region event
         public event EventHandler<object> DeviceStatusEvent;
         public event EventHandler<object> OnDataReceivedEvent;
         #endregion
-
         #region backgroundWorker
         BackgroundWorker doDataWorker = new BackgroundWorker();
         #endregion
-
         #region ctor
         public GocatorDevice(string ipAddr, int bufferSize)
         {
@@ -44,7 +38,6 @@ namespace Gocator
             doDataWorker.RunWorkerCompleted += DoDataWorker_RunWorkerCompleted;
         }
         #endregion
-
         #region backgroundworker event handler
         private void DoDataWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
@@ -52,14 +45,11 @@ namespace Gocator
             mRawDataList.Clear();
             mResult.Clear();
         }
-
         private void DoDataWorker_DoWork(object sender, DoWorkEventArgs e)
         {
             ResolveRawDataList(mRawDataList);
         }
-
         #endregion
-
         #region data resolve
         private void OnData(KObject data)
         {
@@ -69,23 +59,19 @@ namespace Gocator
                 doDataWorker.RunWorkerAsync();
             }
         }
-
         private List<ushort[]> ResolveRawDataList(List<KObject> mRawDataList)
         {
             //Parallel.For(0, mRawDataList.Count, (index) => {
             //    ResolveRawData(mRawDataList[index]);
             //});
-
             for (int i = 0; i < mRawDataList.Count; i++)
             {
                 ResolveRawData(mRawDataList[i]);
             }
-
             StopAcq();
             DeviceStatusEvent?.Invoke(this, $"Finished / Stop Acq/ Return Result");
             return mResult;
         }
-
         private void ResolveRawData(KObject kData)
         {
             GoDataSet dataSet = (GoDataSet)kData;
@@ -100,7 +86,6 @@ namespace Gocator
                         long width = surfaceMsg.Width;
                         long height = surfaceMsg.Length;
                         long bufferSize = width * height;
-
                         mContext.XResolution = (double)surfaceMsg.XResolution / 1000000;
                         mContext.ZResolution = (double)surfaceMsg.ZResolution / 1000000;
                         mContext.XOffset = (double)surfaceMsg.XOffset / 1000;
@@ -123,7 +108,6 @@ namespace Gocator
             DeviceStatusEvent?.Invoke(this, $"Finished {100 * mResult.Count / BufferSize * 1.0} %");
         }
         #endregion
-
         #region Implement IDevice interface
         public bool InitialAcq()
         {
@@ -137,14 +121,12 @@ namespace Gocator
             mSensor.SetDataHandler(OnData);
             return true;
         }
-
         public bool ReleaseAcq()
         {
             this.DeviceStatusEvent = null;
             this.OnDataReceivedEvent = null;
             return true;
         }
-
         public bool StartAcq()
         {
             if (mSensor.State != GoState.Ready)
@@ -155,7 +137,6 @@ namespace Gocator
             DeviceStatusEvent?.Invoke(this, $"Start Acq");
             return true;
         }
-
         public bool StopAcq()
         {
             mSensor.Stop();

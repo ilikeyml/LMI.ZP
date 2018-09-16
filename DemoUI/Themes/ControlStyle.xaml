@@ -5,7 +5,6 @@
         <Setter Property="Background" Value="White"/>
         <Setter Property="Margin" Value="3,0,0,5"/>
         <Setter Property="Height" Value="30" />
-        <Setter Property="BorderBrush" Value="#ff50edef"/>
+        <Setter Property="BorderBrush" Value="#ff5e5e5e"/>
     </Style>
-    
 </ResourceDictionary>

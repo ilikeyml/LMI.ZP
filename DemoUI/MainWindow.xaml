@@ -38,7 +38,9 @@
                 BorderThickness="3"
                 BorderBrush="Black"
                 >
-            <Image >
+            <Image 
+                Stretch ="Uniform"
+                Source="{Binding DisplayImage}" >
                 
             </Image>
             
@@ -50,10 +52,9 @@
             Grid.RowSpan="2"
             >
             <!--Start Acq-->
-            <Button Height="30"
+            <Button 
                     Content="Start"
-                    Background="White"
-                    Margin="3,0,0,5"
+                    Style="{StaticResource CommandButton}"
                     Command="{Binding StartCommand}"
                     />
             <Grid Margin="3,0,0,3">
