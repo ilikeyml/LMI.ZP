@@ -35,15 +35,7 @@ namespace DemoUI.ViewModels
         #region device event
         private void GocatorDevice_OnDataReceivedEvent(object sender, object e)
         {
-            List<ushort[]> result = (List<ushort[]>)e;
-            for (int i = 0; i < result.Count; i++)
-            {
-                Image<Gray, ushort> image = EmguToWpfImage.ZValuesToDepthPng(result[0], gocatorDevice.mContext);
-                curContext.Post(new SendOrPostCallback((o) =>
-                {
-                    DisplayImage = EmguToWpfImage.ToBitmapSource(image);
-                }), null);
-            }
+
         }
         private void GocatorDevice_DeviceStatusEvent(object sender, object e)
         {

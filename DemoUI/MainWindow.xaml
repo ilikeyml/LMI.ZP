@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DemoUI"
+        xmlns:userControl  ="clr-namespace:UserControlLibrary;assembly=UserControlLibrary"
         mc:Ignorable="d"
         FontFamily="{StaticResource RobotoBoldItalic}"
         FontSize="14"
@@ -28,24 +29,9 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="20"/>
-
         </Grid.ColumnDefinitions>
         <!--Image area-->
-        <Border Grid.Column="1" 
-                Grid.Row="1"
-                Grid.ColumnSpan="4"
-                Grid.RowSpan="4" 
-                Background="DarkBlue"
-                BorderThickness="3"
-                BorderBrush="Black"
-                >
-            <Image 
-                Stretch ="Uniform"
-                Source="{Binding DisplayImage}" >
-                
-            </Image>
-            
-        </Border>
+        <userControl:ImageViewer/>
         <!--Button-->
         <StackPanel 
             Grid.Column="5" 
@@ -67,12 +53,10 @@
                     <ColumnDefinition/>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-
                 <Label Grid.Column="0" Grid.Row="0" Content="IP Address"/>
                 <Label Grid.Column="0" Grid.Row="1" Content="BufferSize"/>
                 <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="0" Text="{Binding Path=IPAddress, Mode=OneWay}" />
                 <TextBox IsReadOnly="True" Grid.Column="1" Grid.Row="1"  Text="{Binding Path=BufferSize, Mode=OneWay}"/>
-
             </Grid>
         </StackPanel>
         <!--Log -->

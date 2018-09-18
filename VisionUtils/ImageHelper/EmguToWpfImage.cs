@@ -10,12 +10,25 @@ namespace VisionUtils
 {
     public class EmguToWpfImage
     {
+
+        public static unsafe Mat ZValuesToMat(ushort[] zValues, GocatorContext mContext)
+        {
+            int width = mContext.Width;
+            int height = mContext.Height;
+            int[] size = new int[] { height, width };
+            fixed (ushort* p = zValues)
+            {
+                return new Mat(size, DepthType.Cv16U, (IntPtr)p, null);
+            }
+        }
+
         /// <summary>
         /// Trans zvalues to PNG 16bit
         /// </summary>
         /// <param name="zValues"></param>
         /// <param name="mContext"></param>
         /// <returns></returns>
+        /// 
         public static unsafe Image<Gray, ushort> ZValuesToDepthPng(ushort[] zValues, GocatorContext mContext)
         {
             int width = mContext.Width;
@@ -24,6 +37,10 @@ namespace VisionUtils
             fixed (ushort* p = zValues)
             {
                 Mat depthPng = new Mat(size, DepthType.Cv16U, (IntPtr)p, null);
+
+                //depthPng.ToImage<Rgb, ushort>().Save(@"C:\colorpng.png");
+                //Image<Gray, ushort> trh = depthPng.ToImage<Gray, ushort>().ThresholdBinary(new Gray(10000), new Gray(32768));
+                //trh.Save(@"C:\ trs.png");
                 return depthPng.ToImage<Gray, ushort>();
             }
         }
@@ -31,8 +48,10 @@ namespace VisionUtils
         /// Trans zvalues to colormap
         /// </summary>
         /// <returns></returns>
-        public static Image<Rgb, byte> ZValueToColorMap()
+        public static Image<Rgb,Byte> ZValueToColorMap(Mat mat)
         {
+            //mat.ToImage<Emgu.CV.Structure.Rgb, ushort>
+            
             return null;
         }
         /// <summary>
@@ -58,6 +77,7 @@ namespace VisionUtils
                     Int32Rect.Empty,
                     BitmapSizeOptions.FromEmptyOptions());
                 DeleteObject(ptr); //release the HBitmap
+                
                 return bs;
             }
         }

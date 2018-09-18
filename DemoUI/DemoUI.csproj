@@ -144,6 +144,10 @@
       <Project>{adbed8e9-13a1-49a7-92af-8f36f3cd9593}</Project>
       <Name>Gocator</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UserControlLibrary\UserControlLibrary.csproj">
+      <Project>{de238217-b150-4689-8c5d-122e691cbae0}</Project>
+      <Name>UserControlLibrary</Name>
+    </ProjectReference>
     <ProjectReference Include="..\VisionUtils\VisionUtils.csproj">
       <Project>{f0f7c1f7-7c51-4669-a301-3e83ffab37fc}</Project>
       <Name>VisionUtils</Name>
