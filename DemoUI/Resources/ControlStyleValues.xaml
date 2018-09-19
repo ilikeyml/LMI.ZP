@@ -1,0 +1,32 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:System="clr-namespace:System;assembly=mscorlib">
+
+    <!--  GLOBAL  -->
+    <Thickness x:Key="WindowContentPadding">10</Thickness>
+    <FontFamily x:Key="DefaultFontFamily">Open Sans</FontFamily>
+    <System:Double x:Key="DefaultFontSize">13</System:Double>
+    <System:Double x:Key="ControlDisabled">0.5</System:Double>
+
+    <!--  OTHER TEXT  -->
+    <FontFamily x:Key="DefaultFontFamilySmall">Arial</FontFamily>
+    <System:Double x:Key="DefaultFontSizeSmall">10</System:Double>
+
+    <!--  CHECKBOX  -->
+    <Thickness x:Key="CheckBoxContentPresenterMargin">6,0</Thickness>
+    <Thickness x:Key="CheckBoxBorderThickness">1</Thickness>
+    <Thickness x:Key="CheckBoxMargin">0,2</Thickness>
+    <System:Double x:Key="CheckBoxIndicatorSize">15</System:Double>
+    <CornerRadius x:Key="CheckBoxCornerRadius">2</CornerRadius>
+    <System:Double x:Key="CheckBoxFontSize">13</System:Double>
+    <HorizontalAlignment x:Key="CheckBoxContentPresenterHAlignment">Left</HorizontalAlignment>
+    <VerticalAlignment x:Key="CheckBoxContentPresenterVAlignment">Center</VerticalAlignment>
+
+    <!--  BUTTON  -->
+    <Thickness x:Key="ButtonContentPresenterMargin">6,0</Thickness>
+    <Thickness x:Key="ButtonBorderThickness">1</Thickness>
+    <System:Double x:Key="ButtonFontSize">16</System:Double>
+    <CornerRadius x:Key="ButtonCornerRadius">2</CornerRadius>
+    <HorizontalAlignment x:Key="ButtonContentPresenterHAlignment">Center</HorizontalAlignment>
+    <VerticalAlignment x:Key="ButtonContentPresenterVAlignment">Center</VerticalAlignment>
+</ResourceDictionary>

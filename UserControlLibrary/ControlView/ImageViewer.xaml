@@ -7,9 +7,8 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid>
-        <Border Background="DarkBlue">
-            <Image>
-            </Image>
-        </Border>
+        <!--<WindowsFormsHost>
+            <ImageViewer:ImageBoxEx></ImageViewer:ImageBoxEx>
+        </WindowsFormsHost>-->
     </Grid>
 </UserControl>

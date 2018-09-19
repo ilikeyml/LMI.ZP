@@ -3,7 +3,9 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Gocator;
 using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media.Imaging;
 namespace VisionUtils
@@ -48,12 +50,92 @@ namespace VisionUtils
         /// Trans zvalues to colormap
         /// </summary>
         /// <returns></returns>
-        public static Image<Rgb,Byte> ZValueToColorMap(Mat mat)
+        public static unsafe Image<Rgb, Byte> ZValueToColorMap(ushort[] zValues, GocatorContext mContext)
         {
-            //mat.ToImage<Emgu.CV.Structure.Rgb, ushort>
-            
-            return null;
+
+            Mat mat = ZValuesToMat(zValues, mContext);
+            var maxValue = default(ushort);
+            var minValue = ushort.MaxValue;
+            var nullValue = default(ushort);
+            Parallel.For(0, zValues.Length, (index) =>
+            {
+                var tempZ = zValues[index];
+                if (tempZ != nullValue)
+                {
+                    if (tempZ > maxValue)
+                    {
+                        maxValue = tempZ;
+                    }
+                    if (tempZ < minValue)
+                    {
+                        minValue = tempZ;
+                    }
+                }
+            });
+            Color[] colors = new Color[zValues.Length];
+            Image<Rgb, Byte> image = new Image<Rgb, byte>(mContext.Width, mContext.Height, new Rgb(255, 255, 255));
+            Parallel.For(0, zValues.Length, (index) =>
+            {
+                colors[index] = ToColor(zValues[index], minValue, maxValue, nullValue);
+            });
+
+            for (int i = 0; i < image.Height; i++)
+            {
+                for (int j = 0; j < image.Width; j++)
+                {
+                    Rgb tempColor = new Rgb(colors[j + image.Width *i]);
+                    image[i,j] = tempColor;
+                }
+            }
+            return image;
+
         }
+
+        /// <summary>
+        /// Trans zValues to color
+        /// </summary>
+        /// <param name="ZValue"></param>
+        /// <param name="minValue"></param>
+        /// <param name="maxValue"></param>
+        /// <param name="nullValue"></param>
+        /// <returns></returns>
+        public static Color ToColor(ushort ZValue, ushort minValue, ushort maxValue, ushort nullValue)
+        {
+            Color CC = new Color();
+            int Steps = 255 + 1;
+            int Edges = 7;
+            int Total_Steps = Steps * Edges;
+            double valueRange = maxValue - minValue;
+            CC = Color.FromArgb(0, 0, 0);
+            if (maxValue > minValue)
+            {
+                if (ZValue != nullValue)
+                {
+                    Int32 x = (Int32)(Total_Steps * (ZValue - minValue) / valueRange);
+                    if (x < 0 * Steps)
+                        CC = Color.FromArgb(0, 0, 0);
+                    else if (x < 1 * Steps)
+                        CC = Color.FromArgb(0, 0, x - 0 * Steps);
+                    else if (x < 2 * Steps)
+                        CC = Color.FromArgb(0, x - 1 * Steps, Steps - 1);
+                    else if (x < 3 * Steps)
+                        CC = Color.FromArgb(0, Steps - 1, 3 * Steps - x - 1);
+                    else if (x < 4 * Steps)
+                        CC = Color.FromArgb(x - 3 * Steps, Steps - 1, 0);
+                    else if (x < 5 * Steps)
+                        CC = Color.FromArgb(Steps - 1, 5 * Steps - x - 1, 0);
+                    else if (x < 6 * Steps)
+                        CC = Color.FromArgb(Steps - 1, 0, x - 5 * Steps);
+                    else if (x < 7 * Steps)
+                        CC = Color.FromArgb(Steps - 1, x - 6 * Steps, Steps - 1);
+                    else
+                        CC = Color.FromArgb(Steps - 1, Steps - 1, Steps - 1);
+                }
+            }
+            return CC;
+        }
+
+
         /// <summary>
         /// Delete a GDI object
         /// </summary>
@@ -77,7 +159,7 @@ namespace VisionUtils
                     Int32Rect.Empty,
                     BitmapSizeOptions.FromEmptyOptions());
                 DeleteObject(ptr); //release the HBitmap
-                
+
                 return bs;
             }
         }

@@ -1,0 +1,124 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--  GLOBAL  -->
+    <SolidColorBrush x:Key="DefaultFontColor" Color="#FF585858" />
+    <SolidColorBrush x:Key="WindowBG" Color="#FFDDDDDD" />
+
+    <!--  GROUPBOX  -->
+    <LinearGradientBrush x:Key="GroupBoxBorder" StartPoint="0.5,0" EndPoint="0.5,1">
+        <GradientStop Offset="0" Color="#AAAAAA" />
+        <GradientStop Offset="0.10" Color="#c8c8c8" />
+        <GradientStop Offset="0.90" Color="#c8c8c8" />
+        <GradientStop Offset="1" Color="#efefef" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="GroupBoxBG" Color="#FFD7D7D7" />
+
+    <!--  CHECKBOX  -->
+    <SolidColorBrush x:Key="CheckBoxForeground" Color="#FF585858" />
+    <!--  default  -->
+    <LinearGradientBrush x:Key="CheckBoxBorder" StartPoint="0.500001,0.974286" EndPoint="0.500001,0.0256866">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="#FFFCFCFC" />
+            <GradientStop Offset="0.241379" Color="#FF979797" />
+            <GradientStop Offset="1" Color="#FF575757" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CheckBoxBG" StartPoint="0.500001,0.999985" EndPoint="0.500001,-1.4676e-005">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="#FFA8A8A8" />
+            <GradientStop Offset="1" Color="#FF575757" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <!--  hover  -->
+    <LinearGradientBrush x:Key="CheckBoxBorderHover" StartPoint="0.500001,0.974286" EndPoint="0.500001,0.0256866">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="#FFFCFCFC" />
+            <GradientStop Offset="0.241379" Color="#FF979797" />
+            <GradientStop Offset="1" Color="#FF575757" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CheckBoxBGHover" StartPoint="0.500001,0.999985" EndPoint="0.500001,-1.4676e-005">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="#FFA8A8A8" />
+            <GradientStop Offset="1" Color="#FF575757" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <!--  pressed  -->
+    <LinearGradientBrush x:Key="CheckBoxBorderPressed" StartPoint="0.500001,0.974286" EndPoint="0.500001,0.0256866">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="#FFFCFCFC" />
+            <GradientStop Offset="0.241379" Color="#FFC3C3C3" />
+            <GradientStop Offset="1" Color="#FF6B6B6B" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CheckBoxBGPressed" StartPoint="0.500001,0.999985" EndPoint="0.500001,-1.4676e-005">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0.188" Color="#FFD2D2D2" />
+            <GradientStop Offset="1" Color="#FF777777" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <!--  disabled  -->
+    <LinearGradientBrush x:Key="CheckBoxBorderDisabled" StartPoint="0.500001,0.974286" EndPoint="0.500001,0.0256866">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="#FFFCFCFC" />
+            <GradientStop Offset="0.241379" Color="#FFC3C3C3" />
+            <GradientStop Offset="1" Color="#FF6B6B6B" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="CheckBoxBGDisabled" StartPoint="0.500001,0.999985" EndPoint="0.500001,-1.4676e-005">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0.188" Color="#FFD2D2D2" />
+            <GradientStop Offset="1" Color="#FF777777" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <!--  BUTTON  -->
+    <!--  default  -->
+    <LinearGradientBrush x:Key="ButtonBorder" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFFFFFFF" />
+        <GradientStop Offset="0.841" Color="#FFEAEAEA" />
+        <GradientStop Offset="1" Color="#FF8D8D8D" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBG" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFFFFFFF" />
+        <GradientStop Offset="1.0" Color="#FFE1E1E1" />
+    </LinearGradientBrush>
+    <!--  hover  -->
+    <LinearGradientBrush x:Key="ButtonBorderHover" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFFFFFFF" />
+        <GradientStop Offset="0.841" Color="#FFEAEAEA" />
+        <GradientStop Offset="1" Color="#FF8D8D8D" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ButtonBGHover" Color="White" />
+    <!--  pressed  -->
+    <LinearGradientBrush x:Key="ButtonBGPressed" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFECECEC" />
+        <GradientStop Offset="1.0" Color="#FFDDDDDD" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBorderPressed" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFECECEC" />
+        <GradientStop Offset="1.0" Color="#FFDDDDDD" />
+    </LinearGradientBrush>
+    <LinearGradientBrush x:Key="ButtonBGDisabled" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFFFFFFF" />
+        <GradientStop Offset="1.0" Color="#FFE1E1E1" />
+    </LinearGradientBrush>
+    <!--  disabled  -->
+    <LinearGradientBrush x:Key="ButtonBorderDisabled" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FFFFFFFF" />
+        <GradientStop Offset="0.841" Color="#FFEAEAEA" />
+        <GradientStop Offset="1" Color="#FF8D8D8D" />
+    </LinearGradientBrush>
+
+    <!--  IntegerUpDown  -->
+    <LinearGradientBrush x:Key="IntegerUpDownBorder" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Offset="0.0" Color="#FF888888" />
+        <GradientStop Offset="0.03" Color="#FF888888" />
+        <GradientStop Offset="0.06" Color="#FFAAAAAA" />
+        <GradientStop Offset="0.93" Color="#FFAAAAAA" />
+        <GradientStop Offset="0.95" Color="#FFDDDDDD" />
+        <GradientStop Offset="0.97" Color="White" />
+		<GradientStop Offset="1" Color="White" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="IntegerUpDownBG" Color="White" />
+</ResourceDictionary>

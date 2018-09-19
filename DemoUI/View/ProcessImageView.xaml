@@ -1,0 +1,57 @@
+﻿<Window x:Class="DemoUI.ProcessImageView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:DemoUI"
+        mc:Ignorable="d"
+        Background="{DynamicResource WindowBG}"
+        FontFamily="{DynamicResource DefaultFontFamily}"
+        FontSize="{DynamicResource DefaultFontSize}"
+        Foreground="{DynamicResource DefaultFontColor}"
+        Title="ProcessImageView" Height="544.848" Width="841.101">
+    <Grid Margin= "{DynamicResource WindowContentPadding}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2" />
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="2"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2"/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="2"/>
+        </Grid.ColumnDefinitions>
+        <Canvas Grid.Column="1" Grid.Row="1"
+                   Grid.ColumnSpan =" 3"
+                   Grid.RowSpan="5" 
+                   Background="DarkBlue">
+            <Image Source="{Binding ImageForShow}"/>
+        </Canvas>
+        <ListView 
+            Grid.Column="1"
+            Grid.Row="6"
+            Grid.ColumnSpan="3"
+            Grid.RowSpan="2"
+            ScrollViewer.VerticalScrollBarVisibility="Disabled" 
+            ScrollViewer.HorizontalScrollBarVisibility="Auto"
+             ItemsSource="{Binding ImageItems}">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal" CanVerticallyScroll="False">
+                        <Image Source="{Binding ImageItem}"  Stretch="Uniform" />
+                        <Label  Content="{Binding ImageTips}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
+    </Grid>
+</Window>

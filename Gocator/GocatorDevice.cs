@@ -43,7 +43,6 @@ namespace Gocator
         {
             OnDataReceivedEvent?.Invoke(this, mResult);
             mRawDataList.Clear();
-            mResult.Clear();
         }
         private void DoDataWorker_DoWork(object sender, DoWorkEventArgs e)
         {
@@ -56,14 +55,12 @@ namespace Gocator
             mRawDataList.Add(data);
             if (mRawDataList.Count == BufferSize)
             {
+                mResult.Clear();
                 doDataWorker.RunWorkerAsync();
             }
         }
         private List<ushort[]> ResolveRawDataList(List<KObject> mRawDataList)
         {
-            //Parallel.For(0, mRawDataList.Count, (index) => {
-            //    ResolveRawData(mRawDataList[index]);
-            //});
             for (int i = 0; i < mRawDataList.Count; i++)
             {
                 ResolveRawData(mRawDataList[i]);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,24 +11,20 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Windows.Interactivity;
 
 namespace DemoUI
 {
     /// <summary>
-    /// MainWindow.xaml 的交互逻辑
+    /// ProcessImageView.xaml 的交互逻辑
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ProcessImageView : Window
     {
-        public MainWindow()
+        public ProcessImageView()
         {
             InitializeComponent();
-         
-            this.DataContext = new MainViewModel();
+            this.DataContext = new ProcessImageViewModel();
+            
         }
-
-
     }
 }
