@@ -1,0 +1,82 @@
+﻿<Window x:Class="VisionWorkshop.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisionWorkshop"
+        mc:Ignorable="d"
+        
+        Icon="Images\icon.jpg"
+        Background="#eaeaea"
+        MinHeight="768"
+        MinWidth="1280"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        Title="GocatorVision" Height="768" Width="1280">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="1" Grid.Column="1"          
+                Grid.RowSpan="5" Grid.ColumnSpan="4"
+                Background="#dadada"
+                Margin="5,5,5,5"
+                >
+            <Image  Source="{Binding ImageSource}"/>
+        </Border>
+
+        <StackPanel Grid.Column="5" Grid.Row="1"
+                    Grid.RowSpan="5"
+                    Background="#eaeaea"
+                    >
+            <Button Style ="{StaticResource CustomButton}" Content="Run" Command="{Binding Run}"/>
+            <Button Style ="{StaticResource CustomButton}" Content="Stop"/>
+            <Button  Style="{StaticResource CustomButton}" Content="Debug" Command="{Binding Debug}"/>
+            <Button Style ="{StaticResource CustomButton}" Content="Match" Command="{Binding Match}"/>
+            <Button Style ="{StaticResource CustomButton}" Content="LineEditor01" Command="{Binding LineEditor01}"/>
+            <Button Style ="{StaticResource CustomButton}" Content="LineEditor02"/>
+            <Button Style ="{StaticResource CustomButton}" Content="LineEditor03"/>
+          
+
+        </StackPanel>
+
+        <Border Grid.Row="6" Grid.Column="5"          
+                Background="#eaeaea"
+                >
+            <StackPanel>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        
+                    </Grid.RowDefinitions>
+                    
+                </Grid>
+                
+            </StackPanel>
+        </Border>
+
+        <Border Grid.Row="6" Grid.Column="1"    
+                Grid.ColumnSpan="4"
+                Margin="5,0,5,0"
+                Background="#eaeaea"
+                >
+            <TextBlock Style="{StaticResource CustomMsgBlock}">Info</TextBlock>
+        </Border>
+    </Grid>
+</Window>

@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{ADBED8E9-13A1-49A7-92AF-8F36F3CD9593}</ProjectGuid>
+    <ProjectGuid>{6FEF485F-A81A-49DC-BE97-DF992ED4FBFA}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Gocator</RootNamespace>
-    <AssemblyName>Gocator</AssemblyName>
+    <RootNamespace>AVSMacro</RootNamespace>
+    <AssemblyName>AVSMacro</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,32 +31,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
-    <OutputPath>bin\x64\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x64</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GoSdkNet, Version=1.0.6821.12407, Culture=neutral, PublicKeyToken=3e18828f1dab5c8c, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\GoSDK\5.1.6.9\x64\GoSdkNet.dll</HintPath>
+    <Reference Include="Avl.Net">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Adaptive Vision\Adaptive Vision Library 4.10\bin\x64\Avl.Net.dll</HintPath>
     </Reference>
-    <Reference Include="kApiNet, Version=1.0.6807.11766, Culture=neutral, PublicKeyToken=aed51b4e56ae495f, processorArchitecture=AMD64">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\GoSDK\5.1.6.9\x64\kApiNet.dll</HintPath>
+    <Reference Include="Avl.Net.Designers">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Adaptive Vision\Adaptive Vision Library 4.10\bin\x64\Avl.Net.Designers.dll</HintPath>
+    </Reference>
+    <Reference Include="Avl.Net.TS">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Adaptive Vision\Adaptive Vision Library 4.10\bin\x64\Avl.Net.TS.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -67,10 +51,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GocatorContext.cs" />
-    <Compile Include="GocatorDevice.cs" />
-    <Compile Include="IDevice.cs" />
+    <Compile Include="AcquireSurface.cs" />
+    <Compile Include="FeatureCreation.cs" />
+    <Compile Include="MatchTemplate.cs" />
+    <Compile Include="Measurement.cs" />
+    <Compile Include="PreprocessingImage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Gocator\Gocator.csproj">
+      <Project>{adbed8e9-13a1-49a7-92af-8f36f3cd9593}</Project>
+      <Name>Gocator</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

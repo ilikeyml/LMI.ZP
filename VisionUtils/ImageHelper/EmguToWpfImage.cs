@@ -3,6 +3,7 @@ using Emgu.CV.CvEnum;
 using Emgu.CV.Structure;
 using Gocator;
 using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -12,7 +13,6 @@ namespace VisionUtils
 {
     public class EmguToWpfImage
     {
-
         public static unsafe Mat ZValuesToMat(ushort[] zValues, GocatorContext mContext)
         {
             int width = mContext.Width;
@@ -23,7 +23,6 @@ namespace VisionUtils
                 return new Mat(size, DepthType.Cv16U, (IntPtr)p, null);
             }
         }
-
         /// <summary>
         /// Trans zvalues to PNG 16bit
         /// </summary>
@@ -39,7 +38,6 @@ namespace VisionUtils
             fixed (ushort* p = zValues)
             {
                 Mat depthPng = new Mat(size, DepthType.Cv16U, (IntPtr)p, null);
-
                 //depthPng.ToImage<Rgb, ushort>().Save(@"C:\colorpng.png");
                 //Image<Gray, ushort> trh = depthPng.ToImage<Gray, ushort>().ThresholdBinary(new Gray(10000), new Gray(32768));
                 //trh.Save(@"C:\ trs.png");
@@ -52,7 +50,6 @@ namespace VisionUtils
         /// <returns></returns>
         public static unsafe Image<Rgb, Byte> ZValueToColorMap(ushort[] zValues, GocatorContext mContext)
         {
-
             Mat mat = ZValuesToMat(zValues, mContext);
             var maxValue = default(ushort);
             var minValue = ushort.MaxValue;
@@ -78,19 +75,40 @@ namespace VisionUtils
             {
                 colors[index] = ToColor(zValues[index], minValue, maxValue, nullValue);
             });
-
-            for (int i = 0; i < image.Height; i++)
+            //Bitmap bitmap = new Bitmap(Width, Height);
+            //BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, Width, Height), ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            //IntPtr intPtr = bitmapData.Scan0;
+            //byte[] Pixlemaps = new byte[bitmapData.Stride * bitmapData.Height];
+            //int offset = bitmapData.Stride - bitmapData.Width * 3;
+            //unsafe
+            //{
+            //    byte* pp = (byte*)(void*)bitmapData.Scan0;
+            //    for (int k = 0; k < bitmapData.Height; k++)
+            //    {
+            //        for (int m = 0; m < bitmapData.Width; m++)
+            //        {
+            //            pp[0] = (byte)(colors[k * bitmapData.Width + m].R);
+            //            pp[1] = (byte)(colors[k * bitmapData.Width + m].G);
+            //            pp[2] = (byte)(colors[k * bitmapData.Width + m].B);
+            //            pp += 3;
+            //        }
+            //        pp += bitmapData.Stride - bitmapData.Width * 3;
+            //    }
+            //}
+            //bitmap.UnlockBits(bitmapData);
+           // Bitmap aBitmap = bitmap.Clone(new RectangleF(0, 0, bitmap.Width, bitmap.Height), PixelFormat.Format24bppRgb);
+            Stopwatch st = Stopwatch.StartNew();
+            Parallel.For(0, image.Height, (i) =>
             {
-                for (int j = 0; j < image.Width; j++)
+                Parallel.For(0, image.Width, (j) =>
                 {
-                    Rgb tempColor = new Rgb(colors[j + image.Width *i]);
-                    image[i,j] = tempColor;
-                }
-            }
+                    Rgb tempColor = new Rgb(colors[j + image.Width * i]);
+                    image[i, j] = tempColor;
+                });
+            });
+            Debug.WriteLine($"{st.ElapsedMilliseconds}");
             return image;
-
         }
-
         /// <summary>
         /// Trans zValues to color
         /// </summary>
@@ -134,8 +152,6 @@ namespace VisionUtils
             }
             return CC;
         }
-
-
         /// <summary>
         /// Delete a GDI object
         /// </summary>
@@ -159,7 +175,6 @@ namespace VisionUtils
                     Int32Rect.Empty,
                     BitmapSizeOptions.FromEmptyOptions());
                 DeleteObject(ptr); //release the HBitmap
-
                 return bs;
             }
         }

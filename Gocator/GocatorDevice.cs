@@ -5,6 +5,7 @@ using Lmi3d.Zen.Io;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 namespace Gocator
@@ -61,24 +62,42 @@ namespace Gocator
         }
         private List<ushort[]> ResolveRawDataList(List<KObject> mRawDataList)
         {
+            #region for loop
+            Stopwatch sw = Stopwatch.StartNew();
             for (int i = 0; i < mRawDataList.Count; i++)
             {
-                ResolveRawData(mRawDataList[i]);
+                mResult.Add(ResolveRawData(mRawDataList[i]));
             }
+            Debug.WriteLine($"for loop consuming {sw.ElapsedMilliseconds}");
+            #endregion
+            #region parallel loop
+            //Stopwatch sw = Stopwatch.StartNew();
+            //Task.Run(() =>
+            //{
+            //    Parallel.For(0, BufferSize, (index) =>
+            //    {
+            //        mResult.Add(ResolveRawData(mRawDataList[index]));
+            //    });
+            //}).Wait();
+            //Debug.WriteLine($"Parallel for consuming {sw.ElapsedMilliseconds}");
+            #endregion
             StopAcq();
             DeviceStatusEvent?.Invoke(this, $"Finished / Stop Acq/ Return Result");
             return mResult;
         }
-        private void ResolveRawData(KObject kData)
+        private ushort[] ResolveRawData(KObject kData)
         {
             GoDataSet dataSet = (GoDataSet)kData;
+            ushort[] zValue = new ushort[0];
             mContext = new GocatorContext();
             for (UInt32 i = 0; i < dataSet.Count; i++)
             {
                 GoDataMsg dataObj = (GoDataMsg)dataSet.Get(i);
                 switch (dataObj.MessageType)
                 {
+                    #region SurfaceMsg
                     case GoDataMessageType.Surface:
+
                         GoUniformSurfaceMsg surfaceMsg = (GoUniformSurfaceMsg)dataObj;
                         long width = surfaceMsg.Width;
                         long height = surfaceMsg.Length;
@@ -92,17 +111,19 @@ namespace Gocator
                         mContext.Height = (int)height;
                         IntPtr bufferPointer = surfaceMsg.Data;
                         short[] ranges = new short[bufferSize];
-                        ushort[] zValue = new ushort[bufferSize];
+                        zValue = new ushort[bufferSize];
                         Marshal.Copy(bufferPointer, ranges, 0, ranges.Length);
                         Parallel.For(0, bufferSize, (index) =>
                         {
                             zValue[index] = (ushort)(ranges[index] + 32768);
                         });
-                        mResult.Add(zValue);
                         break;
+                        #endregion
+
                 }
             }
-            DeviceStatusEvent?.Invoke(this, $"Finished {100 * mResult.Count / BufferSize * 1.0} %");
+            DeviceStatusEvent?.Invoke(this, $"Finished {100 * (mResult.Count + 1) / BufferSize * 1.0} %");
+            return zValue;
         }
         #endregion
         #region Implement IDevice interface
@@ -113,9 +134,10 @@ namespace Gocator
             mSystem = new GoSystem();
             mSensor = mSystem.FindSensorByIpAddress(KIpAddress.Parse(IPAddr));
             DeviceStatusEvent?.Invoke(this, $"Find device @ IP address {IPAddr}");
-            mSensor.Connect();
-            mSensor.EnableData(true);
-            mSensor.SetDataHandler(OnData);
+        
+            mSystem.Connect();
+            mSystem.EnableData(true);
+            mSystem.SetDataHandler(OnData);
             return true;
         }
         public bool ReleaseAcq()

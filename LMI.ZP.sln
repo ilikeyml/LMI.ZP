@@ -5,11 +5,15 @@ VisualStudioVersion = 15.0.27703.2000
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gocator", "Gocator\Gocator.csproj", "{ADBED8E9-13A1-49A7-92AF-8F36F3CD9593}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DemoUI", "DemoUI\DemoUI.csproj", "{EF546680-818D-41AA-9747-2A0FBBBC4349}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisionUtils", "VisionUtils\VisionUtils.csproj", "{F0F7C1F7-7C51-4669-A301-3E83FFAB37FC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserControlLibrary", "UserControlLibrary\UserControlLibrary.csproj", "{DE238217-B150-4689-8C5D-122E691CBAE0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleHelper", "ConsoleHelper\ConsoleHelper.csproj", "{EC6EA527-7996-4BFE-982A-3689630D06B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VisionWorkshop", "VisionWorkshop\VisionWorkshop.csproj", "{34FC3DC2-5623-4B79-97EC-4DD6B4DBA307}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HalconVision", "HalconVision\HalconVision.csproj", "{B29DEA59-56ED-4A93-A864-CA16C81E9D56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVSMacro", "AVSMacro\AVSMacro.csproj", "{6FEF485F-A81A-49DC-BE97-DF992ED4FBFA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,18 +25,26 @@ Global
 		{ADBED8E9-13A1-49A7-92AF-8F36F3CD9593}.Debug|Any CPU.Build.0 = Debug|x64
 		{ADBED8E9-13A1-49A7-92AF-8F36F3CD9593}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADBED8E9-13A1-49A7-92AF-8F36F3CD9593}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EF546680-818D-41AA-9747-2A0FBBBC4349}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{EF546680-818D-41AA-9747-2A0FBBBC4349}.Debug|Any CPU.Build.0 = Debug|x64
-		{EF546680-818D-41AA-9747-2A0FBBBC4349}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EF546680-818D-41AA-9747-2A0FBBBC4349}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F0F7C1F7-7C51-4669-A301-3E83FFAB37FC}.Debug|Any CPU.ActiveCfg = Debug|x64
 		{F0F7C1F7-7C51-4669-A301-3E83FFAB37FC}.Debug|Any CPU.Build.0 = Debug|x64
 		{F0F7C1F7-7C51-4669-A301-3E83FFAB37FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F0F7C1F7-7C51-4669-A301-3E83FFAB37FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DE238217-B150-4689-8C5D-122E691CBAE0}.Debug|Any CPU.ActiveCfg = Debug|x64
-		{DE238217-B150-4689-8C5D-122E691CBAE0}.Debug|Any CPU.Build.0 = Debug|x64
-		{DE238217-B150-4689-8C5D-122E691CBAE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DE238217-B150-4689-8C5D-122E691CBAE0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC6EA527-7996-4BFE-982A-3689630D06B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC6EA527-7996-4BFE-982A-3689630D06B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC6EA527-7996-4BFE-982A-3689630D06B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC6EA527-7996-4BFE-982A-3689630D06B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34FC3DC2-5623-4B79-97EC-4DD6B4DBA307}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34FC3DC2-5623-4B79-97EC-4DD6B4DBA307}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34FC3DC2-5623-4B79-97EC-4DD6B4DBA307}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34FC3DC2-5623-4B79-97EC-4DD6B4DBA307}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B29DEA59-56ED-4A93-A864-CA16C81E9D56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B29DEA59-56ED-4A93-A864-CA16C81E9D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B29DEA59-56ED-4A93-A864-CA16C81E9D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B29DEA59-56ED-4A93-A864-CA16C81E9D56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FEF485F-A81A-49DC-BE97-DF992ED4FBFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FEF485F-A81A-49DC-BE97-DF992ED4FBFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FEF485F-A81A-49DC-BE97-DF992ED4FBFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FEF485F-A81A-49DC-BE97-DF992ED4FBFA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,0 +1,6 @@
+﻿namespace AVSMacro
+{
+    class FeatureCreation
+    {
+    }
+}

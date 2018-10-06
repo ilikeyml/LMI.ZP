@@ -1,0 +1,51 @@
+﻿<Window x:Class="VisionWorkshop.View.FilterView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:VisionWorkshop"
+        mc:Ignorable="d"
+        Title="FilterView" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="20"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="20"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="20"/>
+        </Grid.ColumnDefinitions>
+        <Border Grid.Column="1" Grid.Row="1"
+               Grid.RowSpan="4" Grid.ColumnSpan="3"
+                Background ="DarkBlue"
+               >
+            <Image />
+        </Border>
+        <Border
+            Grid.Column="1" Grid.Row="5"
+               Grid.RowSpan="2" Grid.ColumnSpan="3"
+            Background="Beige"
+            >
+            <ItemsControl>
+                <DataTemplate>
+                    <Image/>
+                    
+                </DataTemplate>
+                
+            </ItemsControl>
+            
+            
+        </Border>
+    </Grid>
+</Window>
