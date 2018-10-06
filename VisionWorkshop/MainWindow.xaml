@@ -47,12 +47,12 @@
                     Background="#eaeaea"
                     >
             <Button Style ="{StaticResource CustomButton}" Content="Run" Command="{Binding Run}"/>
-            <Button Style ="{StaticResource CustomButton}" Content="Stop"/>
+            <Button Style ="{StaticResource CustomButton}" Content="Stop" Command="{Binding Stop}"/>
             <Button  Style="{StaticResource CustomButton}" Content="Debug" Command="{Binding Debug}"/>
             <Button Style ="{StaticResource CustomButton}" Content="Match" Command="{Binding Match}"/>
             <Button Style ="{StaticResource CustomButton}" Content="LineEditor01" Command="{Binding LineEditor01}"/>
-            <Button Style ="{StaticResource CustomButton}" Content="LineEditor02"/>
-            <Button Style ="{StaticResource CustomButton}" Content="LineEditor03"/>
+            <Button Style ="{StaticResource CustomButton}" Content="LineEditor02" Command="{Binding LineEditor02}"/>
+            <Button Style ="{StaticResource CustomButton}" Content="LineEditor03" Command="{Binding LineEditor03}"/>
           
 
         </StackPanel>

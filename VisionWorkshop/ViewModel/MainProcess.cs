@@ -10,13 +10,18 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows;
 using AvlNet;
-using AvlNet.ExecutorSerialization;
+using AdaptiveVision;
 using Gocator;
 namespace VisionWorkshop
 {
     public class MainProcess : ViewModel
     {
-        private string _rootPath;
+        #region AVL Helper
+        private readonly ProgramMacrofilters macros;
+        private CoordinateSystem2D CoordinateSystem = new CoordinateSystem2D();
+        private SegmentFittingField SegmentFittingField_01 = new SegmentFittingField();
+        #endregion
+
         public MainProcess()
         {
             RootPath = Environment.CurrentDirectory;
@@ -27,11 +32,23 @@ namespace VisionWorkshop
             LineEditor03 = new RelayCommand(LineEditor03Excute, LineEditor03CanExcute);
             Match = new RelayCommand(MatchExcute, MatchCanExcute);
             Debug = new RelayCommand(DebugExcute, DebugCanExcute);
-            ImageSource = new BitmapImage(new Uri(@"C:\Users\ilike\source\repos\LMI.ZP\VisionWorkshop\Images\lmitechnologieslogo-cube.png"));
+            ImageSource = new BitmapImage(new Uri(ConfigPath.LogoPath));
+            try
+            {
+                string avsProjectPath = ConfigPath.AVProgramPath;
+                macros = ProgramMacrofilters.Create(avsProjectPath);
+                macros.DeserializeCoordinateSystem(ConfigPath.CoordinationSystemPath, out CoordinateSystem);
+                macros.DeserializeFittingField(ConfigPath.SegmentFittingFieldPath_01, out SegmentFittingField_01);
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message);
+            }
         }
+
         #region Gocator
-        
         #endregion
+
         #region file and directory
         private string rootPath;
         public string RootPath
@@ -50,16 +67,12 @@ namespace VisionWorkshop
 
         #region Image manipulation
         public ImageSource ImageSource { get; set; }
-        public ImageInfo DisplayImage { get; set; } = new ImageInfo();
-        public ImageInfo CurrentImage { get; set; } = new ImageInfo();
         public ImageInfo LastImage { get; set; } = new ImageInfo();
         public List<ImageInfo> ImageQueue { get; set; } = new List<ImageInfo>();
+        public bool bFlag { get; set; } = false;
+        public AvlNet.Image[] ToolBackgroundImagesNorm { get; set; } = new AvlNet.Image[0];
         public AvlNet.Image[] ToolBackgroundImages { get; set; } = new AvlNet.Image[0];
-        #endregion
-
-        #region Macro Filter Params
-        CoordinateSystem2D coordinateSystem = new CoordinateSystem2D();
-
+        private AvlNet.Image DisplayImage = new AvlNet.Image();
         #endregion
 
         // <Button Style = "{StaticResource CustomButton}" Content="Run" Command="{Binding Run}"/>
@@ -69,6 +82,7 @@ namespace VisionWorkshop
         //<Button Style = "{StaticResource CustomButton}" Content="LineEditor02"/>
         //<Button Style = "{StaticResource CustomButton}" Content="LineEditor03"/>
         //<Button Style = "{StaticResource CustomButton}" Content="Match"/>
+
         #region run command
         public ICommand Run { get; set; }
         private bool RunCanExcute()
@@ -79,6 +93,7 @@ namespace VisionWorkshop
         {
         }
         #endregion
+
         #region stop command
         public ICommand Stop { get; set; }
         private bool StopCanExcute()
@@ -90,6 +105,7 @@ namespace VisionWorkshop
             throw new NotImplementedException();
         }
         #endregion
+
         #region debug command
         public ICommand Debug { get; set; }
         private bool DebugCanExcute()
@@ -101,46 +117,52 @@ namespace VisionWorkshop
             DebugLoadImage();
         }
         #endregion
+
         #region Line01 editor
         public ICommand LineEditor01 { get; set; }
         private bool LineEditor01CanExcute()
         {
-            return true;
+            return ImageQueue.Count>0;
+            //return bFlag;
         }
         private void LineEditor01Excute()
         {
             FitLineEditor_01();
-
-
         }
         #endregion
+
         #region Line02 editor
         public ICommand LineEditor02 { get; set; }
         private bool LineEditor02CanExcute()
         {
-            throw new NotImplementedException();
+            return ImageQueue.Count>0;
+            //return bFlag;
         }
         private void LineEditor02Excute()
         {
-            throw new NotImplementedException();
+            return;
         }
         #endregion
+
         #region Line03 editor
         public ICommand LineEditor03 { get; set; }
         private bool LineEditor03CanExcute()
         {
-            throw new NotImplementedException();
+            return ImageQueue.Count>0;
+            //return bFlag;
         }
         private void LineEditor03Excute()
         {
-            throw new NotImplementedException();
+            return;
         }
         #endregion
+
         #region Match
         public ICommand Match { get; set; }
         private bool MatchCanExcute()
         {
-            return true;
+            return ImageQueue.Count>0;
+            //return bFlag;
         }
         private void MatchExcute()
         {
@@ -148,33 +170,34 @@ namespace VisionWorkshop
         }
         #endregion
 
-
-
         #region debug func
         void DebugLoadImage()
         {
-            string debugImageFilePath = $@"{RootPath}\LMI\Debug\DebugImage.png";
+            string debugImageFilePath = ConfigPath.DebugImagePath;
             if (ChkFileExist(debugImageFilePath))
             {
                 ImageQueue.Clear();
                 ImageInfo loadImage = new ImageInfo
                 {
-                    Image = System.Drawing.Image.FromFile(debugImageFilePath),
+                    Image = new AvlNet.Image(new Bitmap(debugImageFilePath)),
                     Info = $"Image for debug"
                 };
-                ImageSource = ImageConvert.BitmapToImageSource((Bitmap)loadImage.Image);
-                CurrentImage = loadImage;
-                ImageQueue.Add(CurrentImage);
+                DisplayImage = new AvlNet.Image((Bitmap)loadImage.Image.CreateBitmap().Clone());
+   
+                ImageSource = ImageConvert.BitmapToImageSource(DisplayImage.CreateBitmap());
+                ImageQueue.Add(loadImage);
                 if (ImageQueue.Count > 0)
                 {
+                    ToolBackgroundImagesNorm = new AvlNet.Image[ImageQueue.Count];
                     ToolBackgroundImages = new AvlNet.Image[ImageQueue.Count];
                     for (int i = 0; i < ImageQueue.Count; i++)
                     {
                         AvlNet.Image outImage = new AvlNet.Image();
                         float outA = 0;
                         float outB = 0;
-                        AVL.NormalizeImage(new AvlNet.Image((Bitmap)ImageQueue[i].Image), 0, 255, 0, 0, out outImage, out outA, out outB);
-                        ToolBackgroundImages[i] = outImage;
+                        AVL.NormalizeImage(ImageQueue[i].Image, 0, 255, 0, 0, out outImage, out outA, out outB);
+                        ToolBackgroundImagesNorm[i] = outImage;
+                        ToolBackgroundImages[i] = ImageQueue[i].Image;
                     }
                 }
                 else
@@ -187,41 +210,63 @@ namespace VisionWorkshop
 
         #region match func
         void CreateEdgeModel()
+        {
+            string edgeModelParamFilePath = ConfigPath.EdgeModelParamPath;
+            string edgeModelFilePath = ConfigPath.EdgeModelPath;
+            if (ChkFileExist(edgeModelParamFilePath))
             {
-                string edgeModelParamFilePath = $@"{RootPath}\LMI\FeatureModel\EdgeModelParam.avdata";
-                string edgeModelFilePath = $@"{RootPath}\LMI\FeatureModel\EdgeModel.avdata";
-                if (ChkFileExist(edgeModelParamFilePath))
+                EdgeModelDesigner edgeModelDesigner = new EdgeModelDesigner();
+                edgeModelDesigner.ExpertMode = true;
+                edgeModelDesigner.Backgrounds = ToolBackgroundImagesNorm;
+                edgeModelDesigner.ShowEdges = true;
+                edgeModelDesigner.LoadParameters(edgeModelParamFilePath);
+                if (edgeModelDesigner.ShowDialog() == System.Windows.Forms.DialogResult.OK)
                 {
-                    EdgeModelDesigner edgeModelDesigner = new EdgeModelDesigner();
-                    edgeModelDesigner.ExpertMode = true;
-                    edgeModelDesigner.Backgrounds = ToolBackgroundImages;
-                    edgeModelDesigner.ShowEdges = true;
-                    edgeModelDesigner.LoadParameters(edgeModelParamFilePath);
-                    if (edgeModelDesigner.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+                    edgeModelDesigner.SaveParameters(edgeModelParamFilePath);
+                    EdgeModel edgeModel = new EdgeModel();
+                    edgeModel = edgeModelDesigner.GetEdgeModel();
+                    AVL.SaveEdgeModel(edgeModel, edgeModelFilePath);
+                    CoordinateSystem2D? coordinationSystem = new CoordinateSystem2D();
+                    AvlNet.Path[] edgePath;
+                    AvlNet.Point2D? point2D;
+                    float? MatchScore = -1;
+                    AvlNet.Rectangle2D? matchRect;
+                    macros.Match(ToolBackgroundImagesNorm[0], edgeModel, out coordinationSystem, out edgePath, out point2D, out MatchScore, out matchRect);
+ 
+                    foreach (var item in edgePath)
                     {
-                        edgeModelDesigner.SaveParameters(edgeModelParamFilePath);
-                        EdgeModel edgeModel = new EdgeModel();
-                        edgeModel = edgeModelDesigner.GetEdgeModel();
-                        AVL.SaveEdgeModel(edgeModel, edgeModelFilePath);
-                        MessageBox.Show("New Match Template Saved");
+                        AVL.DrawPath(ref DisplayImage, item, coordinationSystem, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Cross, 2));
                     }
-                }
-                else
-                {
-                    MessageBox.Show("Load File Error");
+                    AVL.DrawPoint(ref DisplayImage, point2D.Value, Pixel.Blue, new DrawingStyle(DrawingMode.Fast, 1, 2, true, PointShape.Cross, 50));
+                    macros.SerializeCoordinateSystem(ConfigPath.CoordinationSystemPath, coordinationSystem.Value);
+                    ImageSource = ImageConvert.BitmapToImageSource(DisplayImage.CreateBitmap());
+                    MessageBox.Show("New Match Template Saved");
                 }
             }
+            else
+            {
+                MessageBox.Show("Load File Error");
+            }
+        }
         #endregion
 
         #region FitLine 1
         void FitLineEditor_01()
         {
-            SegmentFittingFieldArrayDesigner segmentFittingFieldArrayDesigner = new SegmentFittingFieldArrayDesigner();
-            segmentFittingFieldArrayDesigner.Backgrounds = ToolBackgroundImages;
-            segmentFittingFieldArrayDesigner.Message = $"Fit Line Editor 01";
-            segmentFittingFieldArrayDesigner.
-            segmentFittingFieldArrayDesigner.ShowDialog();
-            AVL.saveo
+            SegmentFittingFieldDesigner segmentFittingFieldDesigner = new SegmentFittingFieldDesigner();
+            segmentFittingFieldDesigner.Message = $"Fit line 01";
+            segmentFittingFieldDesigner.Title = $"Fit line 01";
+            segmentFittingFieldDesigner.Backgrounds = ToolBackgroundImages;
+            segmentFittingFieldDesigner.SegmentFittingField = SegmentFittingField_01;
+            segmentFittingFieldDesigner.CoordinateSystems = new CoordinateSystem2D[] { CoordinateSystem };
+            if (segmentFittingFieldDesigner.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            {
+                SegmentFittingField_01 = segmentFittingFieldDesigner.SegmentFittingField;
+                macros.SerializeFittingField(SegmentFittingField_01, ConfigPath.SegmentFittingFieldPath_01);
+
+            
+                MessageBox.Show("Fitting field saved");
+            }
         }
         #endregion
 

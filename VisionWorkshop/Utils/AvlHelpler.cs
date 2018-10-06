@@ -15,7 +15,7 @@ namespace VisionWorkshop
             return outSurface;
         }
 
-        public void MacroParamsLoader(string path)
+        public void MacroParamsLoader()
         {
             
         }

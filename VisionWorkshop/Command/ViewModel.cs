@@ -1,8 +1,9 @@
 ﻿using PropertyChanged;
 namespace VisionWorkshop
 {
-    [AddINotifyPropertyChangedInterface]
-    public class ViewModel
+    [AddINotifyPropertyChangedInterfaceAttribute]
+    public class ViewModel 
     {
+        
     }
 }

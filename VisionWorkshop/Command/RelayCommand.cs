@@ -5,7 +5,12 @@ namespace VisionWorkshop.Command
 {
     public class RelayCommand : ICommand
     {
-        public event EventHandler CanExecuteChanged = (sender, e)=> { };
+        public event EventHandler CanExecuteChanged
+        {
+            add { CommandManager.RequerySuggested += value; }
+            remove { CommandManager.RequerySuggested -= value; }
+        }
+
         public Action _action { get; set; }
         public Func<bool> _func { get; set; }
 
