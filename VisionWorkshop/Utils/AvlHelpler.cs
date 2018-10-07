@@ -1,5 +1,5 @@
 ﻿using AvlNet;
-using Gocator;
+
 namespace VisionWorkshop
 {
     public class AvlHelpler
@@ -8,12 +8,12 @@ namespace VisionWorkshop
         public string EdgeModelParam { get; set; }
 
 
-        public  Surface ZValueToSurface(ushort[] zValue, GocatorContext gocatorContext)
-        {
-            Surface outSurface = new Surface(gocatorContext.Width, gocatorContext.Height, zValue);
-            outSurface.SetOffsetAndScales(gocatorContext.XOffset, gocatorContext.XResolution, gocatorContext.YOffset, gocatorContext.YResolution, gocatorContext.ZOffset, gocatorContext.ZResolution);
-            return outSurface;
-        }
+        //public  Surface ZValueToSurface(ushort[] zValue, GocatorContext gocatorContext)
+        //{
+        //    Surface outSurface = new Surface(gocatorContext.Width, gocatorContext.Height, zValue);
+        //    outSurface.SetOffsetAndScales(gocatorContext.XOffset, gocatorContext.XResolution, gocatorContext.YOffset, gocatorContext.YResolution, gocatorContext.ZOffset, gocatorContext.ZResolution);
+        //    return outSurface;
+        //}
 
         public void MacroParamsLoader()
         {

@@ -17,5 +17,19 @@ namespace VisionWorkshop
                         Int32Rect.Empty,
                         BitmapSizeOptions.FromEmptyOptions());
         }
+
+        public static AvlNet.Point3D TransPoint3DToRealWorld(AvlNet.Point3D inPoint3D, Gocator.GocatorContext mContext)
+        {
+            float x = (float)(inPoint3D.X * mContext.XResolution + mContext.XOffset);
+            float y = (float)(inPoint3D.Y * mContext.YResolution + mContext.YOffset);
+            float z = (float)(inPoint3D.Z * mContext.ZResolution + mContext.ZOffset);
+
+            return new AvlNet.Point3D(x, y, z);
+        }
+
+        public static string Point3DToString(AvlNet.Point3D inPoint3D)
+        {
+            return $"X,{inPoint3D.X},Y,{inPoint3D.Y},Z,{inPoint3D.Z}";
+        }
     }
 }

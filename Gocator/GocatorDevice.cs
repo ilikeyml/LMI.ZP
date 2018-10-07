@@ -33,6 +33,8 @@ namespace Gocator
         #region ctor
         public GocatorDevice(string ipAddr, int bufferSize)
         {
+            KApiLib.Construct();
+            GoSdkLib.Construct();
             IPAddr = ipAddr;
             BufferSize = bufferSize;
             doDataWorker.DoWork += DoDataWorker_DoWork;
@@ -105,8 +107,8 @@ namespace Gocator
                         mContext.XResolution = (double)surfaceMsg.XResolution / 1000000;
                         mContext.ZResolution = (double)surfaceMsg.ZResolution / 1000000;
                         mContext.XOffset = (double)surfaceMsg.XOffset / 1000;
-                        mContext.ZOffset = (double)surfaceMsg.ZOffset / 1000;
-                        mContext.YResolution = (double)surfaceMsg.YResolution / 1000;
+                        mContext.ZOffset = (double)surfaceMsg.ZOffset / 1000 - mContext.ZResolution*32768;
+                        mContext.YResolution = (double)surfaceMsg.YResolution / 1000000;
                         mContext.Width = (int)width;
                         mContext.Height = (int)height;
                         IntPtr bufferPointer = surfaceMsg.Data;
@@ -119,7 +121,6 @@ namespace Gocator
                         });
                         break;
                         #endregion
-
                 }
             }
             DeviceStatusEvent?.Invoke(this, $"Finished {100 * (mResult.Count + 1) / BufferSize * 1.0} %");
@@ -129,13 +130,12 @@ namespace Gocator
         #region Implement IDevice interface
         public bool InitialAcq()
         {
-            KApiLib.Construct();
-            GoSdkLib.Construct();
+
             mSystem = new GoSystem();
             mSensor = mSystem.FindSensorByIpAddress(KIpAddress.Parse(IPAddr));
             DeviceStatusEvent?.Invoke(this, $"Find device @ IP address {IPAddr}");
-        
             mSystem.Connect();
+            DeviceStatusEvent?.Invoke(this, $"Connect to {IPAddr}");
             mSystem.EnableData(true);
             mSystem.SetDataHandler(OnData);
             return true;

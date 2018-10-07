@@ -49,13 +49,13 @@
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GoSdkNet, Version=1.0.6821.12407, Culture=neutral, PublicKeyToken=3e18828f1dab5c8c, processorArchitecture=AMD64">
+    <Reference Include="GoSdkNet, Version=1.0.6746.27121, Culture=neutral, PublicKeyToken=3e18828f1dab5c8c, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\GoSDK\5.1.6.9\x64\GoSdkNet.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\GoSDK\5.0.3.86\GoSdkNet.dll</HintPath>
     </Reference>
-    <Reference Include="kApiNet, Version=1.0.6807.11766, Culture=neutral, PublicKeyToken=aed51b4e56ae495f, processorArchitecture=AMD64">
+    <Reference Include="kApiNet, Version=1.0.6746.23360, Culture=neutral, PublicKeyToken=aed51b4e56ae495f, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\GoSDK\5.1.6.9\x64\kApiNet.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\GoSDK\5.0.3.86\kApiNet.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />

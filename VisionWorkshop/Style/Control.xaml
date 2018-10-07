@@ -67,9 +67,10 @@
     </Style>
 
     <Style TargetType="TextBlock" x:Key="CustomMsgBlock">
-        <Setter Property="TextWrapping" Value="Wrap"/>
+        <Setter Property="Foreground" Value="#111111"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontFamily" Value="{StaticResource RobotoBlackItalic}"/>
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
     </Style>
     
 </ResourceDictionary>

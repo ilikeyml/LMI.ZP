@@ -76,7 +76,9 @@
                 Margin="5,0,5,0"
                 Background="#eaeaea"
                 >
-            <TextBlock Style="{StaticResource CustomMsgBlock}">Info</TextBlock>
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <TextBlock Style="{StaticResource CustomMsgBlock}"  Text="{Binding LoggerInfo}" />
+            </ScrollViewer>
         </Border>
     </Grid>
 </Window>
