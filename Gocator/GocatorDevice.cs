@@ -125,6 +125,7 @@ namespace Gocator
                         IntPtr bufferPointer = surfaceMsg.Data;
                         short[] ranges = new short[bufferSize];
                         zValue = new ushort[bufferSize];
+                        
                         Marshal.Copy(bufferPointer, ranges, 0, ranges.Length);
                         Parallel.For(0, bufferSize, (index) =>
                         {

@@ -38,6 +38,7 @@ namespace VisionWorkshop
         Point3D? outPoint3D01 = new Point3D();
         Point3D? outPoint3D02 = new Point3D();
         #endregion
+        #region ctor
         public MainProcess()
         {
             RootPath = Environment.CurrentDirectory;
@@ -75,6 +76,7 @@ namespace VisionWorkshop
             }
             #endregion
         }
+        #endregion
         #region Gocator Event menber
         readonly GocatorDevice gocator = new GocatorDevice("127.0.0.1", 32);
         private void Gocator_OnDataReceivedEvent(object sender, object e)
@@ -96,8 +98,8 @@ namespace VisionWorkshop
                 AVL.SaveSurface(topSurface, generateSurfaceTopName);
                 string generateSurfaceBottomName = $"{ConfigPath.ImageDataPathBottom}BottomSurface{timeStamp}.avdata";
                 AVL.SaveSurface(bottomSurface, generateSurfaceBottomName);
-
-                AVLRun(topSurface);
+                
+                AVLRun(topSurface, bottomSurface);
                 _context.Post(new SendOrPostCallback((args) => {
 
                     AvlNet.Image tempImage = ImageConvert.ZValueToDepthImage(item.BottomData, gocator.mContextBottom);
@@ -338,23 +340,27 @@ namespace VisionWorkshop
         }
         #endregion
         #region AVL MainProcess
-        void AVLRun(Surface inSurface)
+        void AVLRun(Surface topSurface, Surface bottomSurface)
         {
             macros.DiagnosticMode = true;
-            macros.DetectIntersectionPoints(inSurface, out outLine01, out outLine02,
+            macros.DetectIntersectionPoints(topSurface, out outLine01, out outLine02,
                 out outLine03, out outIntersectionPoint01, out outIntersectionPoint02, out outMatchEdges, out outMatchPoint,out outDepthImage,
                 out SurfaceWidth, out SurfaceHeight
                 );
             
 
-            macros.CropSurfaceByIntersectionPoints(outIntersectionPoint01, outIntersectionPoint02, outLine02, SurfaceWidth, SurfaceHeight, inSurface,
+            macros.CropSurfaceByIntersectionPoints(outIntersectionPoint01, outIntersectionPoint02, outLine02, SurfaceWidth, SurfaceHeight, topSurface,
               out outPoint01Offset, out outPoint02Offset
                 );
             macros.GetPoint3DZValue(outPoint01Offset, outPoint02Offset, outDepthImage, out outPoint3D01, out outPoint3D02);
             Point3D newPoint3D01 = ImageConvert.TransPoint3DToRealWorld(outPoint3D01.Value, gocator.mContextTop);
             Point3D newPoint3D02 = ImageConvert.TransPoint3DToRealWorld(outPoint3D02.Value, gocator.mContextTop);
-            string P1Msg = $"P1,{ImageConvert.Point3DToString(newPoint3D01)}";
-            string P2Msg = $"P2,{ImageConvert.Point3DToString(newPoint3D02)}";
+            float dis01 = -1000;
+            float dis02 = -1000;
+            macros.CalcPointToSurfaceDistance(newPoint3D01, bottomSurface, out dis01);
+            macros.CalcPointToSurfaceDistance(newPoint3D02, bottomSurface, out dis02);
+            string P1Msg = $"P1,{ImageConvert.Point3DToString(newPoint3D01)},Distance,{dis01}";
+            string P2Msg = $"P2,{ImageConvert.Point3DToString(newPoint3D02)},Distance,{dis02}";
             File.AppendAllText($"{ConfigPath.TestResultPath}result01.csv", P1Msg + Environment.NewLine);
             File.AppendAllText($"{ConfigPath.TestResultPath}result02.csv", P2Msg + Environment.NewLine);
             Logger(P1Msg);
