@@ -89,13 +89,12 @@ namespace VisionWorkshop
 
                 Surface bottomSurface = new Surface(gocator.mContextBottom.Width, gocator.mContextBottom.Height, item.BottomData);
                 SurfaceConvert.ScaleSurface(ref bottomSurface, gocator.mContextBottom);
-               
 
-                string generateSurfaceTopName = $"{ConfigPath.ImageDataPathTop}Surface{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.avdata";
+
+                string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
+                string generateSurfaceTopName = $"{ConfigPath.ImageDataPathTop}TopSurface{timeStamp}.avdata";
                 AVL.SaveSurface(topSurface, generateSurfaceTopName);
-
-
-                string generateSurfaceBottomName = $"{ConfigPath.ImageDataPathBottom}Surface{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.avdata";
+                string generateSurfaceBottomName = $"{ConfigPath.ImageDataPathBottom}BottomSurface{timeStamp}.avdata";
                 AVL.SaveSurface(bottomSurface, generateSurfaceBottomName);
 
                 AVLRun(topSurface);
