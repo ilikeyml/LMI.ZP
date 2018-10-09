@@ -20,7 +20,8 @@ namespace VisionWorkshop
     {
         #region AVL Members
         private readonly ProgramMacrofilters macros;
-        AvlNet.Image displayImage = new AvlNet.Image();
+        AvlNet.Image displayImageTop = new AvlNet.Image();
+        AvlNet.Image displayImageBottom = new AvlNet.Image();
         AvlNet.Image outDepthImage = new AvlNet.Image();
         Line2D? outLine01 = new Line2D();
         Line2D? outLine02 = new Line2D();
@@ -37,7 +38,6 @@ namespace VisionWorkshop
         Point3D? outPoint3D01 = new Point3D();
         Point3D? outPoint3D02 = new Point3D();
         #endregion
-
         public MainProcess()
         {
             RootPath = Environment.CurrentDirectory;
@@ -57,7 +57,8 @@ namespace VisionWorkshop
             LineEditor03 = new RelayCommand(LineEditor03Excute, LineEditor03CanExcute);
             Match = new RelayCommand(MatchExcute, MatchCanExcute);
             Debug = new RelayCommand(DebugExcute, DebugCanExcute);
-            ImageSource = new BitmapImage(new Uri(ConfigPath.LogoPath));
+            ImageSourceTop = new BitmapImage(new Uri(ConfigPath.LogoPath));
+            ImageSourceBottom = new BitmapImage(new Uri(ConfigPath.LogoPath));
             #endregion
             #region AVL RunTime
             try
@@ -74,28 +75,37 @@ namespace VisionWorkshop
             }
             #endregion
         }
-
-        #region Gocator Private menber
+        #region Gocator Event menber
         readonly GocatorDevice gocator = new GocatorDevice("127.0.0.1", 32);
         private void Gocator_OnDataReceivedEvent(object sender, object e)
         {
-            List<ushort[]> rawDataSet = (List<ushort[]>)e;
+            List<TopBottomSurface> rawDataSet = (List<TopBottomSurface>)e;
             foreach (var item in rawDataSet)
             {
                 //save to surface
-                Surface tempSurface = new Surface(gocator.mContext.Width, gocator.mContext.Height, item);
-                tempSurface.SetOffsetAndScales(gocator.mContext.XOffset, gocator.mContext.XResolution, gocator.mContext.YOffset, gocator.mContext.YResolution, gocator.mContext.ZOffset, gocator.mContext.ZResolution);
+                Surface topSurface = new Surface(gocator.mContextTop.Width, gocator.mContextTop.Height, item.TopData);
+                SurfaceConvert.ScaleSurface(ref topSurface, gocator.mContextTop);
 
-                string generateSurfaceName = $"{ConfigPath.ImageDataPath}Surface{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.avdata";
 
-                AVL.SaveSurface(tempSurface, generateSurfaceName);
-                AVLRun(tempSurface);
+                Surface bottomSurface = new Surface(gocator.mContextBottom.Width, gocator.mContextBottom.Height, item.BottomData);
+                SurfaceConvert.ScaleSurface(ref bottomSurface, gocator.mContextBottom);
+               
 
-  
+                string generateSurfaceTopName = $"{ConfigPath.ImageDataPathTop}Surface{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.avdata";
+                AVL.SaveSurface(topSurface, generateSurfaceTopName);
 
+
+                string generateSurfaceBottomName = $"{ConfigPath.ImageDataPathBottom}Surface{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.avdata";
+                AVL.SaveSurface(bottomSurface, generateSurfaceBottomName);
+
+                AVLRun(topSurface);
+                _context.Post(new SendOrPostCallback((args) => {
+
+                    AvlNet.Image tempImage = ImageConvert.ZValueToDepthImage(item.BottomData, gocator.mContextBottom);
+                    ImageSourceBottom = ImageConvert.BitmapToImageSource(tempImage.CreateBitmap());
+                }), null);
             }
             Logger("Surface data saved");
-
   
         }
         private void Gocator_DeviceStatusEvent(object sender, object e)
@@ -103,7 +113,6 @@ namespace VisionWorkshop
             Logger(e.ToString());
         }
         #endregion
-
         #region file and directory
         private string rootPath;
         public string RootPath
@@ -120,16 +129,14 @@ namespace VisionWorkshop
         }
         public string LoggerInfo { get; set; }
         #endregion
-
-        #region UI Context
+        #region UI  Sync Context
         SynchronizationContext _context;
         #endregion
-
         #region Image manipulation
-        public ImageSource ImageSource { get; set; }
+        public ImageSource ImageSourceTop { get; set; }
+        public ImageSource ImageSourceBottom { get; set; }
         private AvlNet.Image DisplayImage = new AvlNet.Image();
         #endregion
-
         // <Button Style = "{StaticResource CustomButton}" Content="Run" Command="{Binding Run}"/>
         //<Button Style = "{StaticResource CustomButton}" Content="Stop"/>
         //<Label Style = "{StaticResource CustomLabel}" Content="Debug"/>
@@ -137,7 +144,6 @@ namespace VisionWorkshop
         //<Button Style = "{StaticResource CustomButton}" Content="LineEditor02"/>
         //<Button Style = "{StaticResource CustomButton}" Content="LineEditor03"/>
         //<Button Style = "{StaticResource CustomButton}" Content="Match"/>
-
         #region run command
         public ICommand Run { get; set; }
         private bool RunCanExcute()
@@ -149,7 +155,6 @@ namespace VisionWorkshop
             RunFunc();
         }
         #endregion
-
         #region stop command
         public ICommand Stop { get; set; }
         private bool StopCanExcute()
@@ -161,7 +166,6 @@ namespace VisionWorkshop
             throw new NotImplementedException();
         }
         #endregion
-
         #region debug command
         public ICommand Debug { get; set; }
         private bool DebugCanExcute()
@@ -174,7 +178,6 @@ namespace VisionWorkshop
             return;
         }
         #endregion
-
         #region Line01 editor
         public ICommand LineEditor01 { get; set; }
         private bool LineEditor01CanExcute()
@@ -189,7 +192,6 @@ namespace VisionWorkshop
             return;
         }
         #endregion
-
         #region Line02 editor
         public ICommand LineEditor02 { get; set; }
         private bool LineEditor02CanExcute()
@@ -203,7 +205,6 @@ namespace VisionWorkshop
             return;
         }
         #endregion
-
         #region Line03 editor
         public ICommand LineEditor03 { get; set; }
         private bool LineEditor03CanExcute()
@@ -217,7 +218,6 @@ namespace VisionWorkshop
             return;
         }
         #endregion
-
         #region Match
         public ICommand Match { get; set; }
         private bool MatchCanExcute()
@@ -232,7 +232,6 @@ namespace VisionWorkshop
             return;
         }
         #endregion
-
         #region debug func
         void DebugLoadImage()
         {
@@ -271,7 +270,6 @@ namespace VisionWorkshop
             //}
         }
         #endregion
-
         #region match func
         void CreateEdgeModel()
         {
@@ -312,7 +310,6 @@ namespace VisionWorkshop
             //}
         }
         #endregion
-
         #region FitLine 1
         void FitLineEditor_01()
         {
@@ -335,14 +332,12 @@ namespace VisionWorkshop
             //}
         }
         #endregion
-
         #region Run func
         void RunFunc()
         {
             gocator.StartAcq();
         }
         #endregion
-
         #region AVL MainProcess
         void AVLRun(Surface inSurface)
         {
@@ -351,59 +346,52 @@ namespace VisionWorkshop
                 out outLine03, out outIntersectionPoint01, out outIntersectionPoint02, out outMatchEdges, out outMatchPoint,out outDepthImage,
                 out SurfaceWidth, out SurfaceHeight
                 );
+            
+
             macros.CropSurfaceByIntersectionPoints(outIntersectionPoint01, outIntersectionPoint02, outLine02, SurfaceWidth, SurfaceHeight, inSurface,
               out outPoint01Offset, out outPoint02Offset
                 );
-
             macros.GetPoint3DZValue(outPoint01Offset, outPoint02Offset, outDepthImage, out outPoint3D01, out outPoint3D02);
-
-            Point3D newPoint3D01 = ImageConvert.TransPoint3DToRealWorld(outPoint3D01.Value, gocator.mContext);
-            Point3D newPoint3D02 = ImageConvert.TransPoint3DToRealWorld(outPoint3D02.Value, gocator.mContext);
+            Point3D newPoint3D01 = ImageConvert.TransPoint3DToRealWorld(outPoint3D01.Value, gocator.mContextTop);
+            Point3D newPoint3D02 = ImageConvert.TransPoint3DToRealWorld(outPoint3D02.Value, gocator.mContextTop);
             string P1Msg = $"P1,{ImageConvert.Point3DToString(newPoint3D01)}";
             string P2Msg = $"P2,{ImageConvert.Point3DToString(newPoint3D02)}";
-            File.AppendAllText(@"C:\result01.csv", P1Msg + Environment.NewLine);
-            File.AppendAllText(@"C:\result02.csv", P2Msg + Environment.NewLine);
+            File.AppendAllText($"{ConfigPath.TestResultPath}result01.csv", P1Msg + Environment.NewLine);
+            File.AppendAllText($"{ConfigPath.TestResultPath}result02.csv", P2Msg + Environment.NewLine);
             Logger(P1Msg);
             Logger(P2Msg);
             AVLGraphics(true);
         }
-
         void AVLGraphics(bool graphicsSwitch)
         {
             if (graphicsSwitch)
             {
-                displayImage = new AvlNet.Image(outDepthImage.CreateBitmap());
+                displayImageTop = new AvlNet.Image(outDepthImage.CreateBitmap());
                 
                 //Match Edges
                 foreach (var item in outMatchEdges)
                 {
-                    AVL.DrawPath(ref displayImage, item, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
+                    AVL.DrawPath(ref displayImageTop, item, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
                 }
                 //Match Point
-                AVL.DrawPoint(ref displayImage, outMatchPoint.Value, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 60));
+                AVL.DrawPoint(ref displayImageTop, outMatchPoint.Value, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 60));
                 // Intersection Point 1 
-                AVL.DrawPoint(ref displayImage, outIntersectionPoint01.Value, Pixel.Fuchsia, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
+                AVL.DrawPoint(ref displayImageTop, outIntersectionPoint01.Value, Pixel.Fuchsia, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
                 // Intersection Point 2
-                AVL.DrawPoint(ref displayImage, outIntersectionPoint02.Value, Pixel.Purple, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
+                AVL.DrawPoint(ref displayImageTop, outIntersectionPoint02.Value, Pixel.Purple, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
                 //Fit line
-                AVL.DrawLine(ref displayImage, outLine01.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
-                AVL.DrawLine(ref displayImage, outLine02.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
-                AVL.DrawLine(ref displayImage, outLine03.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
-
+                AVL.DrawLine(ref displayImageTop, outLine01.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
+                AVL.DrawLine(ref displayImageTop, outLine02.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
+                AVL.DrawLine(ref displayImageTop, outLine03.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
                 _context.Post(new SendOrPostCallback((args) => {
-                    ImageSource = ImageConvert.BitmapToImageSource(displayImage.CreateBitmap());
-
+                    ImageSourceTop = ImageConvert.BitmapToImageSource(displayImageTop.CreateBitmap());
                 }), null);
             }
         }
         #endregion
-
         #region logger
         void Logger(string msg)
         {
-            //Dispatcher.CurrentDispatcher.InvokeAsync(() => {
-            //    LoggerInfo += $" {msg}~~~~~~~~@{DateTime.Now.ToString("HH:mm:ss yyyy-MM-dd")}{Environment.NewLine}";
-            //});
             object obj = new object();
             lock (obj)
             {

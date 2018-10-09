@@ -26,7 +26,7 @@ namespace ConsoleHelper
 
                 lock (obj)
                 {
-                    HImage image = HalconToWpf.ZValueToDepthImage(data[index], gocatorDevice.mContext);
+                    HImage image = HalconToWpf.ZValueToDepthImage(data[index], gocatorDevice.mContextTop);
                     image.WriteImage("png", 0, $@"C:\ImageData\Bottom\bottom_{index}.png");
 
                 }

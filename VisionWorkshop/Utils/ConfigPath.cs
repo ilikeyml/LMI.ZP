@@ -27,7 +27,8 @@ namespace VisionWorkshop
         #endregion
 
         #region Image Data
-        public static readonly string ImageDataPath = $@"{RootPath}\LMI\ImageData\";
+        public static readonly string ImageDataPathTop = $@"{RootPath}\LMI\ImageData\Top\";
+        public static readonly string ImageDataPathBottom = $@"{RootPath}\LMI\ImageData\Bottom\";
         #endregion
 
         #region TestResult

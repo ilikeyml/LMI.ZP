@@ -39,7 +39,21 @@
                 Background="#dadada"
                 Margin="5,5,5,5"
                 >
-            <Image  Source="{Binding ImageSource}"/>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+                <Image  Grid.Row="0" Grid.Column="0"  Source="{Binding ImageSourceTop}"/>
+                <Image Grid.Row="0" Grid.Column="1"  Source="{Binding ImageSourceBottom}"/>
+            </Grid>
+
+
+
+         
         </Border>
 
         <StackPanel Grid.Column="5" Grid.Row="1"

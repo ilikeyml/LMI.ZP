@@ -71,6 +71,7 @@
     <Compile Include="GocatorDevice.cs" />
     <Compile Include="IDevice.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TopBottomSurface.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

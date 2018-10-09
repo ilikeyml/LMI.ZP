@@ -16,12 +16,15 @@ namespace Gocator
         GoSystem mSystem;
         GoSensor mSensor;
         List<KObject> mRawDataList = new List<KObject>();
-        List<ushort[]> mResult = new List<ushort[]>();
+        List<TopBottomSurface> mResult = new List<TopBottomSurface>();
+        List<ushort[]> mResultTop = new List<ushort[]>();
+        List<ushort[]> mResultBtm = new List<ushort[]>();
         #endregion
         #region prop
         public string IPAddr { get; set; }
         public int BufferSize { get; set; }
-        public GocatorContext mContext { get; private set; }
+        public GocatorContext mContextTop { get; private set; }
+        public GocatorContext mContextBottom { get; private set; }
         #endregion
         #region event
         public event EventHandler<object> DeviceStatusEvent;
@@ -62,13 +65,13 @@ namespace Gocator
                 doDataWorker.RunWorkerAsync();
             }
         }
-        private List<ushort[]> ResolveRawDataList(List<KObject> mRawDataList)
+        private List<TopBottomSurface> ResolveRawDataList(List<KObject> mRawDataList)
         {
             #region for loop
             Stopwatch sw = Stopwatch.StartNew();
             for (int i = 0; i < mRawDataList.Count; i++)
             {
-                mResult.Add(ResolveRawData(mRawDataList[i]));
+               ResolveRawData(mRawDataList[i]);
             }
             Debug.WriteLine($"for loop consuming {sw.ElapsedMilliseconds}");
             #endregion
@@ -87,19 +90,27 @@ namespace Gocator
             DeviceStatusEvent?.Invoke(this, $"Finished / Stop Acq/ Return Result");
             return mResult;
         }
-        private ushort[] ResolveRawData(KObject kData)
+        private void ResolveRawData(KObject kData)
         {
             GoDataSet dataSet = (GoDataSet)kData;
             ushort[] zValue = new ushort[0];
-            mContext = new GocatorContext();
+            TopBottomSurface topBottomSurface = new TopBottomSurface(SurfaceType.TopBottom);
             for (UInt32 i = 0; i < dataSet.Count; i++)
             {
                 GoDataMsg dataObj = (GoDataMsg)dataSet.Get(i);
+
                 switch (dataObj.MessageType)
                 {
                     #region SurfaceMsg
                     case GoDataMessageType.Surface:
-
+                        GocatorContext mContext = new GocatorContext();
+                        //public const int None = -1;
+                        //public const int Top = 0;
+                        //public const int Bottom = 1;
+                        //public const int Left = 2;
+                        //public const int Right = 3;
+                        //public const int TopBottom = 4;
+                        //public const int LeftRight = 5;
                         GoUniformSurfaceMsg surfaceMsg = (GoUniformSurfaceMsg)dataObj;
                         long width = surfaceMsg.Width;
                         long height = surfaceMsg.Length;
@@ -107,7 +118,7 @@ namespace Gocator
                         mContext.XResolution = (double)surfaceMsg.XResolution / 1000000;
                         mContext.ZResolution = (double)surfaceMsg.ZResolution / 1000000;
                         mContext.XOffset = (double)surfaceMsg.XOffset / 1000;
-                        mContext.ZOffset = (double)surfaceMsg.ZOffset / 1000 - mContext.ZResolution*32768;
+                        mContext.ZOffset = (double)surfaceMsg.ZOffset / 1000 - mContext.ZResolution * 32768;
                         mContext.YResolution = (double)surfaceMsg.YResolution / 1000000;
                         mContext.Width = (int)width;
                         mContext.Height = (int)height;
@@ -119,12 +130,25 @@ namespace Gocator
                         {
                             zValue[index] = (ushort)(ranges[index] + 32768);
                         });
+                        if (surfaceMsg.Source.Value == 0)
+                        {
+                            topBottomSurface.TopData = zValue;
+                            mContextTop = mContext;
+
+                        }
+                        else if(surfaceMsg.Source.Value == 1)
+                        {
+                            topBottomSurface.BottomData = zValue;
+                            mContextBottom = mContext;
+                        }
+
                         break;
                         #endregion
                 }
             }
-            DeviceStatusEvent?.Invoke(this, $"Finished {100 * (mResult.Count + 1) / BufferSize * 1.0} %");
-            return zValue;
+            mResult.Add(topBottomSurface);
+            DeviceStatusEvent?.Invoke(this, $"Finished {100 * (mResult.Count) / BufferSize * 1.0} %");
+
         }
         #endregion
         #region Implement IDevice interface

@@ -26,6 +26,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -81,6 +82,7 @@
     <Compile Include="Utils\GraphicConvert.cs" />
     <Compile Include="Utils\ImageConvert.cs" />
     <Compile Include="Utils\ImageInfo.cs" />
+    <Compile Include="Utils\SurfaceConvert.cs" />
     <Compile Include="ViewModel\MainProcess.cs" />
     <Compile Include="View\FilterView.xaml.cs">
       <DependentUpon>FilterView.xaml</DependentUpon>
@@ -154,7 +156,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FodyWeavers.xml" />
+    <Resource Include="FodyWeavers.xml">
+      <SubType>Designer</SubType>
+    </Resource>
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\icon.jpg" />

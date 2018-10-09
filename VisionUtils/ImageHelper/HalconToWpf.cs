@@ -14,7 +14,7 @@ namespace VisionUtils.ImageHelper
                 {
                     image.GenImage1("uint2", context.Width, context.Height, (IntPtr)p);
                 }
-                catch (HalconException e)
+                catch (HalconException ee)
                 {
                     throw;
                 }
