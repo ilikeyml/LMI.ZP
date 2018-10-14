@@ -14,29 +14,36 @@ using AdaptiveVision;
 using System.Threading;
 using Gocator;
 using System.Windows.Threading;
+using System.Linq;
+using System.Diagnostics;
+using System.Net.Sockets;
+using System.Net;
+using VisionWorkshop.Utils;
+using System.Text;
 namespace VisionWorkshop
 {
     public class MainProcess : ViewModel
     {
+
+        #region Graphics
+        System.Drawing.Color LineColor = System.Drawing.Color.FromArgb(50, 255, 0);
+
+        #endregion
+
+        #region Socket Server
+        AsyncTcpServer server;
+        #endregion  
         #region AVL Members
-        private readonly ProgramMacrofilters macros;
+        private readonly SinvoProgramMacrofilters macros;
         AvlNet.Image displayImageTop = new AvlNet.Image();
         AvlNet.Image displayImageBottom = new AvlNet.Image();
-        AvlNet.Image outDepthImage = new AvlNet.Image();
-        Line2D? outLine01 = new Line2D();
-        Line2D? outLine02 = new Line2D();
-        Line2D? outLine03 = new Line2D();
-        Point2D? outIntersectionPoint01 = new Point2D();
-        Point2D? outIntersectionPoint02 = new Point2D();
-        AvlNet.Path[] outMatchEdges = new AvlNet.Path[0];
-        Point2D? outMatchPoint = new Point2D();
+        AvlNet.Image TopIntensityImage = new AvlNet.Image();
+        AvlNet.Image BottomIntensityImage = new AvlNet.Image();
+        AvlNet.Image TopDepthImage = new AvlNet.Image();
+        AvlNet.Image BottomDepthImage = new AvlNet.Image();
         int SurfaceWidth = 0;
         int SurfaceHeight = 0;
-        //Crop Surface by region
-        Point2D? outPoint01Offset = new Point2D();
-        Point2D? outPoint02Offset = new Point2D();
-        Point3D? outPoint3D01 = new Point3D();
-        Point3D? outPoint3D02 = new Point3D();
+
         #endregion
         #region ctor
         public MainProcess()
@@ -45,6 +52,16 @@ namespace VisionWorkshop
             _context = SynchronizationContext.Current;
             string msg = $"System start ";
             Logger(msg);
+            server = new AsyncTcpServer(9999);
+            server.Encoding = Encoding.UTF8;
+            server.ClientConnected +=
+            new EventHandler<TcpClientConnectedEventArgs>(server_ClientConnected);
+            server.ClientDisconnected +=
+            new EventHandler<TcpClientDisconnectedEventArgs>(server_ClientDisconnected);
+            server.PlaintextReceived +=
+            new EventHandler<TcpDatagramReceivedEventArgs<string>>(server_PlaintextReceived);
+            server.Start();
+            Logger("Server listening");
             #region Gocator Initi
             gocator.DeviceStatusEvent += Gocator_DeviceStatusEvent;
             gocator.OnDataReceivedEvent += Gocator_OnDataReceivedEvent;
@@ -65,10 +82,7 @@ namespace VisionWorkshop
             try
             {
                 string avsProjectPath = ConfigPath.AVProgramPath;
-                macros = ProgramMacrofilters.Create(avsProjectPath);
-                //macros.DeserializeCoordinateSystem(ConfigPath.CoordinationSystemPath, out CoordinateSystem);
-                //macros.DeserializeFittingField(ConfigPath.SegmentFittingFieldPath_01, out SegmentFittingField_01);
-                //AVL.LoadEdgeModel(ConfigPath.EdgeModelPath, out EdgeModel);
+                macros = SinvoProgramMacrofilters.Create(avsProjectPath);
             }
             catch (Exception e)
             {
@@ -76,38 +90,54 @@ namespace VisionWorkshop
             }
             #endregion
         }
+        private void server_PlaintextReceived(object sender, TcpDatagramReceivedEventArgs<string> e)
+        {
+            throw new NotImplementedException();
+        }
+        private void server_ClientDisconnected(object sender, TcpClientDisconnectedEventArgs e)
+        {
+            Logger($" {e.TcpClient.Client.RemoteEndPoint} Disconnect");
+        }
+        private void server_ClientConnected(object sender, TcpClientConnectedEventArgs e)
+        {
+            Logger($" {e.TcpClient.Client.RemoteEndPoint} Connect");
+        }
         #endregion
         #region Gocator Event menber
-        readonly GocatorDevice gocator = new GocatorDevice("127.0.0.1", 32);
+        readonly GocatorDevice gocator = new GocatorDevice("127.0.0.1", 33);
         private void Gocator_OnDataReceivedEvent(object sender, object e)
         {
+            Stopwatch sw = new Stopwatch();
+            sw.Start();
             List<TopBottomSurface> rawDataSet = (List<TopBottomSurface>)e;
             foreach (var item in rawDataSet)
             {
                 //save to surface
-                Surface topSurface = new Surface(gocator.mContextTop.Width, gocator.mContextTop.Height, item.TopData);
+                Surface topSurface = new Surface(gocator.mContextTop.Width, gocator.mContextTop.Height, item.TopSurfaceData);
                 SurfaceConvert.ScaleSurface(ref topSurface, gocator.mContextTop);
-
-
-                Surface bottomSurface = new Surface(gocator.mContextBottom.Width, gocator.mContextBottom.Height, item.BottomData);
+                Surface bottomSurface = new Surface(gocator.mContextBottom.Width, gocator.mContextBottom.Height, item.BottomSurfaceData);
                 SurfaceConvert.ScaleSurface(ref bottomSurface, gocator.mContextBottom);
+                TopDepthImage = ImageConvert.ZValueToDepthImage(item.TopSurfaceData, gocator.mContextTop);
+                BottomDepthImage = ImageConvert.ZValueToDepthImage(item.BottomSurfaceData, gocator.mContextBottom);
+                TopIntensityImage = ImageConvert.ByteToIntensityBitmap(item.TopSurfaceIntensityData, gocator.mContextTop);
+                BottomIntensityImage = ImageConvert.ByteToIntensityBitmap(item.BottomSurfaceIntensityData, gocator.mContextBottom);
+                
+                AVLRun(topSurface, bottomSurface, TopDepthImage, BottomDepthImage, TopIntensityImage, BottomIntensityImage);
 
+                server.SendAll("-1000");
+                sw.Stop();
+                Logger($"{sw.ElapsedMilliseconds}");
+                Logger("Send Data to Client -1000");
 
                 string timeStamp = DateTime.Now.ToString("yyyyMMddHHmmssfff");
                 string generateSurfaceTopName = $"{ConfigPath.ImageDataPathTop}TopSurface{timeStamp}.avdata";
                 AVL.SaveSurface(topSurface, generateSurfaceTopName);
                 string generateSurfaceBottomName = $"{ConfigPath.ImageDataPathBottom}BottomSurface{timeStamp}.avdata";
                 AVL.SaveSurface(bottomSurface, generateSurfaceBottomName);
-                
-                AVLRun(topSurface, bottomSurface);
-                _context.Post(new SendOrPostCallback((args) => {
-
-                    AvlNet.Image tempImage = ImageConvert.ZValueToDepthImage(item.BottomData, gocator.mContextBottom);
-                    ImageSourceBottom = ImageConvert.BitmapToImageSource(tempImage.CreateBitmap());
-                }), null);
             }
             Logger("Surface data saved");
-  
+
+            //gocator.StartAcq();
         }
         private void Gocator_DeviceStatusEvent(object sender, object e)
         {
@@ -137,6 +167,12 @@ namespace VisionWorkshop
         public ImageSource ImageSourceTop { get; set; }
         public ImageSource ImageSourceBottom { get; set; }
         private AvlNet.Image DisplayImage = new AvlNet.Image();
+        private float? TopPointValue;
+        private float? BottomPointValue;
+        private float? TopRefValue;
+        private float? BottomRefValue;
+        private Point2D? TopPoint;
+        private Point2D? BottomPoint;
         #endregion
         // <Button Style = "{StaticResource CustomButton}" Content="Run" Command="{Binding Run}"/>
         //<Button Style = "{StaticResource CustomButton}" Content="Stop"/>
@@ -171,12 +207,12 @@ namespace VisionWorkshop
         public ICommand Debug { get; set; }
         private bool DebugCanExcute()
         {
-            return false;
+            return true;
         }
         private void DebugExcute()
         {
-            //DebugLoadImage();
-            return;
+            DebugLoadImage();
+            //return;
         }
         #endregion
         #region Line01 editor
@@ -236,39 +272,26 @@ namespace VisionWorkshop
         #region debug func
         void DebugLoadImage()
         {
-            //string debugImageFilePath = ConfigPath.DebugImagePath;
-            //if (ChkFileExist(debugImageFilePath))
-            //{
-            //    ImageQueue.Clear();
-            //    ImageInfo loadImage = new ImageInfo
-            //    {
-            //        Image = new AvlNet.Image(),
-            //        Info = $"Image for debug"
-            //    };
-            //    DisplayImage = new AvlNet.Image(loadImage.Image);
-            //    ImageSource = ImageConvert.BitmapToImageSource(DisplayImage.CreateBitmap());
-            //    ImageQueue.Add(loadImage);
-            //    if (ImageQueue.Count > 0)
-            //    {
-            //        ToolBackgroundImagesNorm = new AvlNet.Image[ImageQueue.Count];
-            //        ToolBackgroundImages = new AvlNet.Image[ImageQueue.Count];
-            //        for (int i = 0; i < ImageQueue.Count; i++)
-            //        {
-            //            AvlNet.Image outImage = new AvlNet.Image();
-            //            float outA = 0;
-            //            float outB = 0;
-            //            AVL.NormalizeImage(ImageQueue[i].Image, 0, 255, 0, 0, out outImage, out outA, out outB);
-            //            ToolBackgroundImagesNorm[i] = outImage;
-            //            ToolBackgroundImages[i] = ImageQueue[i].Image;
-            //        }
-            //        ToolBackgroundImagesNorm[0].Save(@"C:\ToolBackgroundImagesNorm.png");
-            //        ToolBackgroundImages[0].Save(@"C:\ToolBackgroundImages.png");
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("No Debug Image");
-            //    }
-            //}
+
+            //delete all files
+            var botData = Directory.GetFiles(ConfigPath.ImageDataPathBottom);
+            foreach (var item in botData)
+            {
+                File.Delete(item);
+            }
+            botData = Directory.GetFiles(ConfigPath.ImageDataPathTop);
+            foreach (var item in botData)
+            {
+                File.Delete(item);
+            }
+
+            botData = Directory.GetFiles(ConfigPath.TestResultPath);
+            foreach (var item in botData)
+            {
+                File.Delete(item);
+            }
+
+            Logger("Files delete");
         }
         #endregion
         #region match func
@@ -340,57 +363,73 @@ namespace VisionWorkshop
         }
         #endregion
         #region AVL MainProcess
-        void AVLRun(Surface topSurface, Surface bottomSurface)
+        void AVLRun(Surface topSurface, Surface bottomSurface, AvlNet.Image topDepthImage, AvlNet.Image bottomDepthImage, AvlNet.Image topIntensityImage, AvlNet.Image bottomIntensityImage)
         {
-            macros.DiagnosticMode = true;
-            macros.DetectIntersectionPoints(topSurface, out outLine01, out outLine02,
-                out outLine03, out outIntersectionPoint01, out outIntersectionPoint02, out outMatchEdges, out outMatchPoint,out outDepthImage,
-                out SurfaceWidth, out SurfaceHeight
-                );
-            
+          
+            double dis01 = -1000;
+            double dis02 = -1000;
 
-            macros.CropSurfaceByIntersectionPoints(outIntersectionPoint01, outIntersectionPoint02, outLine02, SurfaceWidth, SurfaceHeight, topSurface,
-              out outPoint01Offset, out outPoint02Offset
-                );
-            macros.GetPoint3DZValue(outPoint01Offset, outPoint02Offset, outDepthImage, out outPoint3D01, out outPoint3D02);
-            Point3D newPoint3D01 = ImageConvert.TransPoint3DToRealWorld(outPoint3D01.Value, gocator.mContextTop);
-            Point3D newPoint3D02 = ImageConvert.TransPoint3DToRealWorld(outPoint3D02.Value, gocator.mContextTop);
-            float dis01 = -1000;
-            float dis02 = -1000;
-            macros.CalcPointToSurfaceDistance(newPoint3D01, bottomSurface, out dis01);
-            macros.CalcPointToSurfaceDistance(newPoint3D02, bottomSurface, out dis02);
-            string P1Msg = $"P1,{ImageConvert.Point3DToString(newPoint3D01)},Distance,{dis01}";
-            string P2Msg = $"P2,{ImageConvert.Point3DToString(newPoint3D02)},Distance,{dis02}";
+            macros.TopPoint(topIntensityImage, topDepthImage, out TopPointValue,out TopPoint);
+
+            macros.BottomPoint(topDepthImage, topIntensityImage, out BottomPointValue,out BottomPoint);
+
+            macros.TopRef(bottomIntensityImage, bottomDepthImage, out TopRefValue);
+            macros.BottomRef(bottomIntensityImage, bottomDepthImage, out BottomRefValue);
+
+            Point3D topPoint = ImageConvert.TransPoint3DToRealWorld(new Point3D(TopPoint.Value.X, TopPoint.Value.Y, TopPointValue.Value), gocator.mContextTop);
+
+            Point3D bottomPoint  = ImageConvert.TransPoint3DToRealWorld(new Point3D(BottomPoint.Value.X, BottomPoint.Value.Y, BottomPointValue.Value), gocator.mContextTop);
+
+            Point3D topRefPoint = ImageConvert.TransPoint3DToRealWorld(new Point3D(0, 0, TopRefValue.Value), gocator.mContextBottom);
+
+            Point3D bottomRefPoint = ImageConvert.TransPoint3DToRealWorld(new Point3D(0, 0, BottomRefValue.Value), gocator.mContextBottom);
+
+            dis01 = ImageConvert.CalcZGap(topPoint, topRefPoint, gocator.mContextTop);
+            dis02 = ImageConvert.CalcZGap(bottomPoint, bottomRefPoint, gocator.mContextTop);
+
+
+            string P1Msg = $"P1,{ImageConvert.Point3DToString(topPoint)},Distance,{dis01},Ref,{TopRefValue.Value}";
+            string P2Msg = $"P2,{ImageConvert.Point3DToString(bottomPoint)},Distance,{dis02},Ref,{ BottomRefValue.Value}";
             File.AppendAllText($"{ConfigPath.TestResultPath}result01.csv", P1Msg + Environment.NewLine);
             File.AppendAllText($"{ConfigPath.TestResultPath}result02.csv", P2Msg + Environment.NewLine);
             Logger(P1Msg);
             Logger(P2Msg);
-            AVLGraphics(true);
+            _context.Post(new SendOrPostCallback((e) =>
+            {
+                AVLGraphics(true);
+            }), new object());
+
+ 
+
         }
         void AVLGraphics(bool graphicsSwitch)
         {
             if (graphicsSwitch)
             {
-                displayImageTop = new AvlNet.Image(outDepthImage.CreateBitmap());
-                
+                displayImageTop = new AvlNet.Image(TopIntensityImage.CreateBitmap());
+                displayImageBottom = new AvlNet.Image(BottomIntensityImage.CreateBitmap());
                 //Match Edges
-                foreach (var item in outMatchEdges)
-                {
-                    AVL.DrawPath(ref displayImageTop, item, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
-                }
+                //foreach (var item in outMatchEdges)
+                //{
+                //    AVL.DrawPath(ref displayImageTop, item, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
+                //}
                 //Match Point
-                AVL.DrawPoint(ref displayImageTop, outMatchPoint.Value, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 60));
+                //AVL.DrawPoint(ref displayImageTop, outMatchPoint.Value, Pixel.Green, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 60));
                 // Intersection Point 1 
-                AVL.DrawPoint(ref displayImageTop, outIntersectionPoint01.Value, Pixel.Fuchsia, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
+                // AVL.DrawPoint(ref displayImageTop, outIntersectionPoint01.Value, Pixel.Fuchsia, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
                 // Intersection Point 2
-                AVL.DrawPoint(ref displayImageTop, outIntersectionPoint02.Value, Pixel.Purple, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
+                // AVL.DrawPoint(ref displayImageTop, outIntersectionPoint02.Value, Pixel.Purple, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
                 //Fit line
-                AVL.DrawLine(ref displayImageTop, outLine01.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
-                AVL.DrawLine(ref displayImageTop, outLine02.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
-                AVL.DrawLine(ref displayImageTop, outLine03.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
-                _context.Post(new SendOrPostCallback((args) => {
-                    ImageSourceTop = ImageConvert.BitmapToImageSource(displayImageTop.CreateBitmap());
-                }), null);
+                //AVL.DrawLine(ref displayImageTop, outLine01.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
+                //AVL.DrawLine(ref displayImageTop, outLine02.Value, Pixel.Yellow, new DrawingStyle(DrawingMode.Fast, 1, 1, false, PointShape.Circle, 2));
+                //AVL.DrawLine(ref displayImageTop, outLineMid.Value, new Pixel(LineColor), new DrawingStyle(DrawingMode.Fast, 1, 2, false, PointShape.Circle, 2));
+                //AVL.DrawPoint(ref displayImageTop, MidPoint01.Value, Pixel.Fuchsia, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
+                // AVL.DrawPoint(ref displayImageTop, MidPoint02.Value, Pixel.Fuchsia, new DrawingStyle(DrawingMode.Fast, 1, 5, false, PointShape.Cross, 120));
+                //displayImageTop.Save($@"{ConfigPath.ImageDataPathTop}{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.png");
+                
+                ImageSourceTop = ImageConvert.BitmapToImageSource(displayImageTop.CreateBitmap());
+                ImageSourceBottom = ImageConvert.BitmapToImageSource(displayImageBottom.CreateBitmap());
+
             }
         }
         #endregion
@@ -400,8 +439,9 @@ namespace VisionWorkshop
             object obj = new object();
             lock (obj)
             {
-                _context.Post(new SendOrPostCallback((e) => {
-                    LoggerInfo += $" {msg}~~~~~~~~@{DateTime.Now.ToString("HH:mm:ss yyyy-MM-dd")}{Environment.NewLine}";
+                _context.Post(new SendOrPostCallback((e) =>
+                {
+                    LoggerInfo = $" [{DateTime.Now.ToString("HH:mm:ss")}]:{msg}{Environment.NewLine}" + LoggerInfo;
                 }), new object());
             }
         }

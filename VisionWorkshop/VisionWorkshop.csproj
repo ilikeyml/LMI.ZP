@@ -47,11 +47,11 @@
     <Reference Include="Avl.Net.TS">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Adaptive Vision\Adaptive Vision Library 4.10\bin\x64\Avl.Net.TS.dll</HintPath>
     </Reference>
-    <Reference Include="ProgramMacrofilters">
-      <HintPath>bin\Debug\LMI\AVProgram\ProgramMacrofilters.dll</HintPath>
-    </Reference>
     <Reference Include="PropertyChanged, Version=2.5.12.0, Culture=neutral, PublicKeyToken=ee3ee20bcf148ddd, processorArchitecture=MSIL">
       <HintPath>..\packages\PropertyChanged.Fody.2.5.12\lib\net452\PropertyChanged.dll</HintPath>
+    </Reference>
+    <Reference Include="SinvoProgramMacrofilters">
+      <HintPath>bin\Debug\LMI\AVProgram\SinvoProgramMacrofilters.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -77,12 +77,17 @@
     </ApplicationDefinition>
     <Compile Include="Command\RelayCommand.cs" />
     <Compile Include="Command\ViewModel.cs" />
+    <Compile Include="Utils\AsyncTcpServer.cs" />
     <Compile Include="Utils\AvlHelpler.cs" />
     <Compile Include="Utils\ConfigPath.cs" />
     <Compile Include="Utils\GraphicConvert.cs" />
     <Compile Include="Utils\ImageConvert.cs" />
     <Compile Include="Utils\ImageInfo.cs" />
     <Compile Include="Utils\SurfaceConvert.cs" />
+    <Compile Include="Utils\TcpClientConnectedEventArgs.cs" />
+    <Compile Include="Utils\TcpClientDisconnectedEventArgs.cs" />
+    <Compile Include="Utils\TcpClientState.cs" />
+    <Compile Include="Utils\TcpDatagramReceivedEventArgs.cs" />
     <Compile Include="ViewModel\MainProcess.cs" />
     <Compile Include="View\FilterView.xaml.cs">
       <DependentUpon>FilterView.xaml</DependentUpon>

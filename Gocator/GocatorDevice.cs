@@ -55,7 +55,7 @@ namespace Gocator
             ResolveRawDataList(mRawDataList);
         }
         #endregion
-        #region data resolve
+        #region Ondata  Gocator Callback
         private void OnData(KObject data)
         {
             mRawDataList.Add(data);
@@ -65,6 +65,8 @@ namespace Gocator
                 doDataWorker.RunWorkerAsync();
             }
         }
+        #endregion
+        #region data resolve
         private List<TopBottomSurface> ResolveRawDataList(List<KObject> mRawDataList)
         {
             #region for loop
@@ -90,6 +92,8 @@ namespace Gocator
             DeviceStatusEvent?.Invoke(this, $"Finished / Stop Acq/ Return Result");
             return mResult;
         }
+        #endregion
+        #region  Surface Message Resolve
         private void ResolveRawData(KObject kData)
         {
             GoDataSet dataSet = (GoDataSet)kData;
@@ -104,13 +108,6 @@ namespace Gocator
                     #region SurfaceMsg
                     case GoDataMessageType.Surface:
                         GocatorContext mContext = new GocatorContext();
-                        //public const int None = -1;
-                        //public const int Top = 0;
-                        //public const int Bottom = 1;
-                        //public const int Left = 2;
-                        //public const int Right = 3;
-                        //public const int TopBottom = 4;
-                        //public const int LeftRight = 5;
                         GoUniformSurfaceMsg surfaceMsg = (GoUniformSurfaceMsg)dataObj;
                         long width = surfaceMsg.Width;
                         long height = surfaceMsg.Length;
@@ -125,7 +122,6 @@ namespace Gocator
                         IntPtr bufferPointer = surfaceMsg.Data;
                         short[] ranges = new short[bufferSize];
                         zValue = new ushort[bufferSize];
-                        
                         Marshal.Copy(bufferPointer, ranges, 0, ranges.Length);
                         Parallel.For(0, bufferSize, (index) =>
                         {
@@ -133,18 +129,40 @@ namespace Gocator
                         });
                         if (surfaceMsg.Source.Value == 0)
                         {
-                            topBottomSurface.TopData = zValue;
+                            topBottomSurface.TopSurfaceData = zValue;
                             mContextTop = mContext;
-
                         }
                         else if(surfaceMsg.Source.Value == 1)
                         {
-                            topBottomSurface.BottomData = zValue;
+                            topBottomSurface.BottomSurfaceData = zValue;
                             mContextBottom = mContext;
                         }
 
                         break;
-                        #endregion
+                    #endregion
+
+
+                    case GoDataMessageType.SurfaceIntensity:
+                        GoSurfaceIntensityMsg goSurfaceIntensityMsg = (GoSurfaceIntensityMsg)dataObj;
+                        long widthIntensity = goSurfaceIntensityMsg.Width;
+                        long heightIntensity = goSurfaceIntensityMsg.Length;
+                        long bufferSizeIntensity = widthIntensity * heightIntensity;
+                        IntPtr bufferPointeri = goSurfaceIntensityMsg.Data;
+                        byte[] rangesIntensity = new byte[bufferSizeIntensity];
+                        Marshal.Copy(bufferPointeri, rangesIntensity, 0, rangesIntensity.Length);
+                        if (goSurfaceIntensityMsg.Source.Value == 0)
+                        {
+                            topBottomSurface.TopSurfaceIntensityData = rangesIntensity;
+                      
+                        }
+                        else if (goSurfaceIntensityMsg.Source.Value == 1)
+                        {
+                            topBottomSurface.BottomSurfaceIntensityData = rangesIntensity;
+                      
+                        }
+                        break;
+
+
                 }
             }
             mResult.Add(topBottomSurface);
@@ -152,6 +170,7 @@ namespace Gocator
 
         }
         #endregion
+
         #region Implement IDevice interface
         public bool InitialAcq()
         {

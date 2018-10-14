@@ -14,8 +14,10 @@ namespace Gocator
     }
     public class TopBottomSurface
     {
-        public ushort[] TopData { get; set; }
-        public ushort[] BottomData { get; set; }
+        public ushort[] TopSurfaceData { get; set; }
+        public ushort[] BottomSurfaceData { get; set; }
+        public byte[] TopSurfaceIntensityData { get; set; }
+        public byte[]BottomSurfaceIntensityData { get; set; }
         public SurfaceType SurfaceType { get; set; } = SurfaceType.Top;
         public TopBottomSurface(SurfaceType surfaceType)
         {
